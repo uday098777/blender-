@@ -43,7 +43,13 @@ const WP = [
     footer:'Navigate carefully - greatness awaits those who dare.',hue:20},
   {nx:0.75,ny:0.85,title:'GHOST SHIP BAY',tag:'LEGEND',sub:'Echoes of Past Voyagers',
     secs:[{h:'STORIES OF OLD',b:'Learn from the victories and defeats of previous hackathon fleets. Their legends guide yer journey.'},{h:'HALLS OF FAME',b:'The greatest projects and innovators are immortalized here. Will yer crew join their ranks?'}],
-    footer:'History remembers those who dare to sail beyond the horizon.',hue:33}
+    footer:'History remembers those who dare to sail beyond the horizon.',hue:33},
+  {nx:0.92,ny:0.12,title:'NORTHERN LIGHTHOUSE',tag:'BEACON',sub:'Guidance for Voyagers',
+    secs:[{h:'NAVIGATION WISDOM',b:'When lost at sea, look to the lighthouse. Mentors and guides stand ready to illuminate yer path through technical challenges.'},{h:'SIGNAL FLAGS',b:'Communication is key. Use Slack, Discord, and team channels to coordinate with crew and organizers throughout the voyage.'}],
+    footer:'The lighthouse never dims - guidance available around the clock.',hue:31},
+  {nx:0.88,ny:0.88,title:'SMUGGLERS COVE',tag:'HIDDEN',sub:'Bonus Challenges',
+    secs:[{h:'SECRET BOUNTIES',b:'Beyond the main treasure, hidden challenges await those who explore every corner. Solve side quests for extra rewards and recognition.'},{h:'THE BLACK MARKET',b:'Trade resources, skills, and knowledge with other crews. Collaboration across teams is encouraged for learning and growth.'}],
+    footer:'Fortune favors the curious - explore every shadow and crevice.',hue:19}
 ];
 
 function wpToJS(wp){
@@ -75,29 +81,29 @@ var cuS=new THREE.Scene();cuS.add(new THREE.AmbientLight(0xffffff,1.0));cuS.add(
 var clock=new THREE.Clock();var loader=new THREE.GLTFLoader();
 var bookRoot=null,mapRoot=null,boatRoot=null,cuRoot=null;
 var appState='loading';var baseMapScale=1,mapMult=2.4;
-var bx=W/2,by=H*0.52;var dragging=false,dox=0,doy=0;var cuRaf=null;var visitedCount=0;var animating=false;
+var bx=W/2,by=H*0.52;var dragging=false,dox=0,doy=0;var cuRaf=null;var visitedCount=0;var animating=false;var lastBoatX=W/2,lastBoatY=H*0.52;
 var WP=${wpArray};
 function setProgress(f){var p=Math.round(Math.min(f,1)*100);var bar=document.getElementById('bar');var pct=document.getElementById('pct');if(bar)bar.style.width=p+'%';if(pct)pct.textContent=p+'%';}
 function fitTo(obj,size){obj.updateWorldMatrix(true,true);var box=new THREE.Box3().setFromObject(obj);if(box.isEmpty())return;var sz=new THREE.Vector3();box.getSize(sz);var ct=new THREE.Vector3();box.getCenter(ct);var mx=Math.max(sz.x,sz.y,sz.z);if(mx<=0)return;var s=size/mx;obj.scale.setScalar(s);obj.position.set(-ct.x*s,-ct.y*s,-ct.z*s);}
 function goToMap(){if(appState!=='book'||animating)return;animating=true;appState='transitioning';document.getElementById('book-hint').style.display='none';document.getElementById('fade').classList.add('in');setTimeout(function(){document.body.classList.add('map-mode');animateMapIn();document.getElementById('fade').classList.remove('in');setTimeout(function(){document.getElementById('map-title').style.opacity='1';appState='map';animating=false;updateHint();},800);},900);}
 function animateMapIn(){if(!mapRoot)return;mapRoot.scale.setScalar(0.001);mapRoot.rotation.y=0;var t0=performance.now(),dur=1000,tgt=baseMapScale*mapMult;(function tick(){var p=Math.min((performance.now()-t0)/dur,1);mapRoot.scale.setScalar(0.001+(1-Math.pow(1-p,3))*(tgt-0.001));if(p<1)requestAnimationFrame(tick);})();}
 function updateHint(){var h=document.getElementById('waypoint-hint');if(!h)return;h.textContent=visitedCount>=WP.length?'All locations discovered - True Pirate Legend!':'Drag the ship to discover locations ('+visitedCount+'/'+WP.length+')';}
-document.getElementById('mini-canvas').addEventListener('click',function(){if(appState==='popup'){closePopup();}else if(appState==='map'){animateMapIn();bx=W/2;by=H*0.52;updateBoatEl();}});
+document.getElementById('mini-canvas').addEventListener('click',function(){if(appState==='popup'){closePopup();}else if(appState==='map'){animateMapIn();bx=lastBoatX;by=lastBoatY;updateBoatEl();syncBoat();}});
 var boatEl=document.getElementById('boat-drag');
 function updateBoatEl(){boatEl.style.left=bx+'px';boatEl.style.top=by+'px';}
 updateBoatEl();
 function s2w(sx,sy){var nx=(sx/W)*2-1,ny=-(sy/H)*2+1;var v=new THREE.Vector3(nx,ny,0.5).unproject(mapCam);var d=v.sub(mapCam.position).normalize();if(Math.abs(d.y)<0.0001)return new THREE.Vector3(0,0,0);var t2=-mapCam.position.y/d.y;return new THREE.Vector3(mapCam.position.x+d.x*t2,0,mapCam.position.z+d.z*t2);}
 function syncBoat(){if(!boatRoot)return;var w=s2w(bx,by);boatRoot.position.set(w.x,0.22,w.z);}
-boatEl.addEventListener('mousedown',function(e){if(appState!=='map')return;e.preventDefault();dragging=true;dox=e.clientX-bx;doy=e.clientY-by;boatEl.style.cursor='grabbing';});
-document.addEventListener('mousemove',function(e){if(!dragging)return;bx=Math.max(60,Math.min(W-60,e.clientX-dox));by=Math.max(60,Math.min(H-60,e.clientY-doy));updateBoatEl();syncBoat();});
+boatEl.addEventListener('mousedown',function(e){if(appState!=='map')return;e.preventDefault();e.stopPropagation();dragging=true;dox=e.clientX-bx;doy=e.clientY-by;boatEl.style.cursor='grabbing';});
+document.addEventListener('mousemove',function(e){if(!dragging)return;e.preventDefault();bx=Math.max(60,Math.min(W-60,e.clientX-dox));by=Math.max(60,Math.min(H-60,e.clientY-doy));updateBoatEl();syncBoat();});
 document.addEventListener('mouseup',function(){if(!dragging)return;dragging=false;boatEl.style.cursor='grab';checkWP();});
-boatEl.addEventListener('touchstart',function(e){if(appState!=='map')return;e.preventDefault();var t=e.touches[0];dragging=true;dox=t.clientX-bx;doy=t.clientY-by;},{passive:false});
+boatEl.addEventListener('touchstart',function(e){if(appState!=='map')return;e.preventDefault();e.stopPropagation();var t=e.touches[0];dragging=true;dox=t.clientX-bx;doy=t.clientY-by;},{passive:false});
 document.addEventListener('touchmove',function(e){if(!dragging)return;e.preventDefault();var t=e.touches[0];bx=Math.max(60,Math.min(W-60,t.clientX-dox));by=Math.max(60,Math.min(H-60,t.clientY-doy));updateBoatEl();syncBoat();},{passive:false});
 document.addEventListener('touchend',function(){if(!dragging)return;dragging=false;checkWP();});
 function checkWP(){if(appState!=='map')return;for(var i=0;i<WP.length;i++){var wp=WP[i];if(wp.done)continue;var dx=bx-wp.nx*W,dy=by-wp.ny*H;if(Math.sqrt(dx*dx+dy*dy)<140){wp.done=true;visitedCount++;doArrival(bx,by,wp);return;}}}
 function doArrival(sx,sy,wp){var cols=['#DAA520','#FF8C00','#ffffff'];for(var i=0;i<3;i++){(function(delay,col){setTimeout(function(){var r=document.createElement('div');r.className='arr-ring';r.style.left=sx+'px';r.style.top=sy+'px';r.style.borderColor=col;r.style.animationDuration=(1+delay*0.001)+'s';document.body.appendChild(r);setTimeout(function(){r.remove();},1500);},delay);})(i*200,cols[i]);}boatEl.style.transition='transform 0.7s cubic-bezier(0.175,0.885,0.32,1.275)';boatEl.style.transform='translate(-50%,-50%) scale(2.8)';setTimeout(function(){boatEl.style.transition='transform 0.4s ease';boatEl.style.transform='translate(-50%,-50%) scale(1)';setTimeout(function(){openPopup(wp);},420);},730);updateHint();}
-function openPopup(wp){appState='popup';document.body.classList.add('popup-mode');var box=document.getElementById('loc-box');var ov=document.getElementById('loc-overlay');var html='';html+='<div class="lp-tag">'+wp.tag+'</div>';html+='<h2 class="lp-title">'+wp.title+'</h2>';html+='<div class="lp-sub">'+wp.sub+'</div>';html+='<div class="lp-deco">~ * ~</div>';for(var i=0;i<wp.secs.length;i++){html+='<div class="lp-sec">';html+='<div class="lp-sh">'+wp.secs[i].h+'</div>';html+='<div class="lp-sb">'+wp.secs[i].b+'</div>';html+='</div>';}html+='<div class="lp-footer">'+wp.footer+'</div>';html+='<div class="lp-hint">Click the mini-map below to return to the voyage</div>';box.innerHTML=html;var h=wp.hue;box.style.background='radial-gradient(ellipse at 28% 18%,hsl('+(h+16)+',62%,80%) 0%,hsl('+h+',55%,62%) 32%,hsl('+(h-18)+',50%,40%) 100%)';ov.style.display='flex';box.style.transform='scale(0.03)';box.offsetHeight;box.style.transition='transform 0.9s cubic-bezier(0.175,0.885,0.32,1.275)';setTimeout(function(){ov.style.opacity='1';box.style.transform='scale(1)';},20);document.getElementById('mini-hint').textContent='Click to return';}
-function closePopup(){var ov=document.getElementById('loc-overlay');var box=document.getElementById('loc-box');document.body.classList.remove('popup-mode');ov.style.opacity='0';box.style.transition='transform 0.5s cubic-bezier(0.55,0,1,0.45)';box.style.transform='scale(0.03)';setTimeout(function(){ov.style.display='none';appState='map';animateMapIn();bx=W/2;by=H*0.52;updateBoatEl();syncBoat();document.getElementById('mini-hint').textContent='Click to reset';},550);}
+function openPopup(wp){appState='popup';document.body.classList.add('popup-mode');lastBoatX=bx;lastBoatY=by;var box=document.getElementById('loc-box');var ov=document.getElementById('loc-overlay');var html='';html+='<div class="lp-tag">'+wp.tag+'</div>';html+='<h2 class="lp-title">'+wp.title+'</h2>';html+='<div class="lp-sub">'+wp.sub+'</div>';html+='<div class="lp-deco">~ * ~</div>';for(var i=0;i<wp.secs.length;i++){html+='<div class="lp-sec">';html+='<div class="lp-sh">'+wp.secs[i].h+'</div>';html+='<div class="lp-sb">'+wp.secs[i].b+'</div>';html+='</div>';}html+='<div class="lp-footer">'+wp.footer+'</div>';html+='<div class="lp-hint">Click the mini-map below to return to the voyage</div>';box.innerHTML=html;var h=wp.hue;box.style.background='radial-gradient(ellipse at 28% 18%,hsl('+(h+16)+',62%,80%) 0%,hsl('+h+',55%,62%) 32%,hsl('+(h-18)+',50%,40%) 100%)';ov.style.display='flex';box.style.transform='scale(0.03)';box.offsetHeight;box.style.transition='transform 0.9s cubic-bezier(0.175,0.885,0.32,1.275)';setTimeout(function(){ov.style.opacity='1';box.style.transform='scale(1)';},20);document.getElementById('mini-hint').textContent='Click to return';}
+function closePopup(){var ov=document.getElementById('loc-overlay');var box=document.getElementById('loc-box');document.body.classList.remove('popup-mode');ov.style.opacity='0';box.style.transition='transform 0.5s cubic-bezier(0.55,0,1,0.45)';box.style.transform='scale(0.03)';setTimeout(function(){ov.style.display='none';appState='map';animateMapIn();bx=lastBoatX;by=lastBoatY;updateBoatEl();syncBoat();document.getElementById('mini-hint').textContent='Click to reset';},550);}
 document.getElementById('open-rules-btn').addEventListener('click',function(){var ov=document.getElementById('rules-overlay');var wrap=document.getElementById('rules-wrap');ov.style.display='flex';ov.style.opacity='0';wrap.style.transform='scale(0.3) rotateY(28deg)';wrap.style.transition='transform 0.65s cubic-bezier(0.175,0.885,0.32,1.275)';setTimeout(function(){ov.style.opacity='1';wrap.style.transform='scale(1) rotateY(0deg)';},20);startCU();});
 document.getElementById('close-rules').addEventListener('click',function(){var ov=document.getElementById('rules-overlay');ov.style.opacity='0';document.getElementById('rules-wrap').style.transform='scale(0.3) rotateY(28deg)';setTimeout(function(){ov.style.display='none';stopCU();},480);});
 function startCU(){if(cuRaf)return;(function tick(){cuRaf=requestAnimationFrame(tick);if(cuRoot){var t=clock.getElapsedTime();cuRoot.scale.setScalar(cuRoot._bs*2);cuRoot.rotation.y=t*0.35;cuRoot.position.y=Math.sin(t*0.7)*0.06;}cuR.render(cuS,cuCam);})();}
@@ -136,9 +142,10 @@ body.popup-mode #mini-wrap{display:flex}
 #mini-canvas{width:180px;height:130px;border:3px solid #8B4513;border-radius:6px;cursor:pointer;box-shadow:0 0 0 1px rgba(218,165,32,.4),0 6px 24px rgba(0,0,0,.85);transition:transform .25s,box-shadow .25s;display:block}
 #mini-canvas:hover{transform:scale(1.06);box-shadow:0 0 0 2px rgba(218,165,32,.8),0 8px 28px rgba(0,0,0,.9)}
 #mini-hint{font-family:'Pirata One',cursive;color:#DAA520;font-size:.7rem;text-shadow:0 1px 5px rgba(0,0,0,.9);text-align:center;pointer-events:none}
-#boat-drag{position:fixed;width:110px;height:110px;cursor:grab;z-index:8;transform:translate(-50%,-50%);display:none;user-select:none;touch-action:none}
+#boat-drag{position:fixed;width:220px;height:220px;cursor:grab;z-index:9;transform:translate(-50%,-50%);display:none;user-select:none;touch-action:none;background:transparent;pointer-events:auto}
 body.map-mode #boat-drag{display:block}
-#boat-drag:active{cursor:grabbing}
+#boat-drag:hover{cursor:grab}
+#boat-drag:active{cursor:grabbing!important}
 #loading{position:fixed;inset:0;z-index:500;background:#07040a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
 #loading.out{opacity:0;pointer-events:none}
 #loading h1{font-family:'Pirata One',cursive;color:#DAA520;font-size:2.8rem;letter-spacing:6px;margin-bottom:10px;text-shadow:0 0 30px rgba(218,165,32,.45)}

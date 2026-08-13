@@ -22,9 +22,10 @@ body.popup-mode #mini-wrap{display:flex}
 #mini-canvas{width:180px;height:130px;border:3px solid #8B4513;border-radius:6px;cursor:pointer;box-shadow:0 0 0 1px rgba(218,165,32,.4),0 6px 24px rgba(0,0,0,.85);transition:transform .25s,box-shadow .25s;display:block}
 #mini-canvas:hover{transform:scale(1.06);box-shadow:0 0 0 2px rgba(218,165,32,.8),0 8px 28px rgba(0,0,0,.9)}
 #mini-hint{font-family:'Pirata One',cursive;color:#DAA520;font-size:.7rem;text-shadow:0 1px 5px rgba(0,0,0,.9);text-align:center;pointer-events:none}
-#boat-drag{position:fixed;width:110px;height:110px;cursor:grab;z-index:8;transform:translate(-50%,-50%);display:none;user-select:none;touch-action:none}
+#boat-drag{position:fixed;width:220px;height:220px;cursor:grab;z-index:9;transform:translate(-50%,-50%);display:none;user-select:none;touch-action:none;background:transparent;pointer-events:auto}
 body.map-mode #boat-drag{display:block}
-#boat-drag:active{cursor:grabbing}
+#boat-drag:hover{cursor:grab}
+#boat-drag:active{cursor:grabbing!important}
 #loading{position:fixed;inset:0;z-index:500;background:#07040a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
 #loading.out{opacity:0;pointer-events:none}
 #loading h1{font-family:'Pirata One',cursive;color:#DAA520;font-size:2.8rem;letter-spacing:6px;margin-bottom:10px;text-shadow:0 0 30px rgba(218,165,32,.45)}
