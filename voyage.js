@@ -30,7 +30,7 @@ bookCam.position.set(0,0.8,5.5);bookCam.lookAt(0,0.3,0);
 var mapCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
 mapCam.position.set(0,2.5,7);mapCam.lookAt(0,-0.3,0);
 var boatCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-boatCam.position.set(0,3.2,0.01);boatCam.lookAt(0,0,0);
+boatCam.position.set(0,2.8,6);boatCam.lookAt(0,0.2,0);
 var miniCam=new THREE.PerspectiveCamera(50,180/130,0.01,500);
 miniCam.position.set(0,7,9);miniCam.lookAt(0,0,0);
 var cuCam=new THREE.PerspectiveCamera(35,300/412,0.01,500);
@@ -146,7 +146,7 @@ function s2w(sx,sy){
 }
 function syncBoat(){
   if(!boatRoot)return;
-  var w=s2w(bx,by);boatRoot.position.set(w.x,0,w.z);
+  var w=s2w(bx,by);boatRoot.position.set(w.x,0.22,w.z);
 }
 
 boatEl.addEventListener('mousedown',function(e){
@@ -306,7 +306,7 @@ function animate(){
   if(appState==='map'||appState==='transitioning'||appState==='popup'){
     if(mapRoot)mapRoot.position.y=Math.sin(t*0.3)*0.04;
     mapR.render(mapS,mapCam);
-    if(boatRoot){boatRoot.rotation.y=t*0.85;}
+    if(boatRoot){boatRoot.rotation.y=t*0.85;boatRoot.position.y=0.22+Math.sin(t*1.1)*0.05;}
     boatR.render(boatS,boatCam);
     miniR.render(mapS,miniCam);
   }
@@ -362,9 +362,9 @@ loader.load('pirate_map.glb',function(g){
 },null,function(e){console.error('Map:',e);onLoad();});
 
 loader.load('ship_pinnace_aft_diff.glb',function(g){
-  var inner=g.scene;fitTo(inner,1.2);
+  var inner=g.scene;fitTo(inner,0.85);
   boatRoot=new THREE.Group();boatRoot.add(inner);
-  boatRoot.position.set(0,0,0);
+  boatRoot.position.set(0,0.22,0);
   boatS.add(boatRoot);onLoad();
 },null,function(e){console.error('Ship:',e);onLoad();});
 

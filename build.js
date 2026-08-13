@@ -209,7 +209,7 @@ bookCam.position.set(0,0.8,5.5);bookCam.lookAt(0,0.3,0);
 var mapCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
 mapCam.position.set(0,2.5,7);mapCam.lookAt(0,-0.3,0);
 var boatCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-boatCam.position.set(0,3.2,0.01);boatCam.lookAt(0,0,0);
+boatCam.position.set(0,2.8,6);boatCam.lookAt(0,0.2,0);
 var miniCam=new THREE.PerspectiveCamera(50,180/130,0.01,500);
 miniCam.position.set(0,7,9);miniCam.lookAt(0,0,0);
 var cuCam=new THREE.PerspectiveCamera(35,300/412,0.01,500);
@@ -316,7 +316,7 @@ function s2w(sx,sy){
 }
 function syncBoat(){
   if(!boatRoot)return;
-  var w=s2w(bx,by);boatRoot.position.set(w.x,0,w.z);
+  var w=s2w(bx,by);boatRoot.position.set(w.x,0.22,w.z);
 }
 
 boatEl.addEventListener('mousedown',function(e){
@@ -476,7 +476,7 @@ function animate(){
   if(appState==='map'||appState==='transitioning'||appState==='popup'){
     if(mapRoot)mapRoot.position.y=Math.sin(t*0.3)*0.04;
     mapR.render(mapS,mapCam);
-    if(boatRoot){boatRoot.rotation.y=t*0.85;}
+    if(boatRoot){boatRoot.rotation.y=t*0.85;boatRoot.position.y=0.22+Math.sin(t*1.1)*0.05;}
     boatR.render(boatS,boatCam);
     miniR.render(mapS,miniCam);
   }
@@ -532,9 +532,9 @@ loader.load('pirate_map.glb',function(g){
 },null,function(e){console.error('Map:',e);onLoad();});
 
 loader.load('ship_pinnace_aft_diff.glb',function(g){
-  var inner=g.scene;fitTo(inner,1.2);
+  var inner=g.scene;fitTo(inner,0.85);
   boatRoot=new THREE.Group();boatRoot.add(inner);
-  boatRoot.position.set(0,0,0);
+  boatRoot.position.set(0,0.22,0);
   boatS.add(boatRoot);onLoad();
 },null,function(e){console.error('Ship:',e);onLoad();});
 
@@ -569,7 +569,7 @@ body.map-mode #book-canvas{display:none!important}
 body.map-mode #map-canvas{display:block!important}
 #boat-canvas{display:none;position:fixed;top:0;left:0;z-index:7;pointer-events:none}
 body.map-mode #boat-canvas{display:block}
-#mini-wrap{display:none;position:fixed;bottom:20px;right:20px;z-index:20;flex-direction:column;align-items:center;gap:6px}
+#mini-wrap{display:none;position:fixed;bottom:20px;right:20px;z-index:120;flex-direction:column;align-items:center;gap:6px;pointer-events:auto}
 body.popup-mode #mini-wrap{display:flex}
 #mini-canvas{width:180px;height:130px;border:3px solid #8B4513;border-radius:6px;cursor:pointer;
   box-shadow:0 0 0 1px rgba(218,165,32,.4),0 6px 24px rgba(0,0,0,.85);transition:transform .25s,box-shadow .25s;display:block}
@@ -599,9 +599,9 @@ body.map-mode #open-rules-btn{opacity:1;pointer-events:all}
 body.map-mode #waypoint-hint{opacity:1}
 @keyframes arrRing{0%{transform:translate(-50%,-50%) scale(.08);opacity:1}100%{transform:translate(-50%,-50%) scale(5.5);opacity:0}}
 .arr-ring{position:fixed;width:70px;height:70px;border-radius:50%;border:3px solid #DAA520;pointer-events:none;z-index:50;transform:translate(-50%,-50%);animation:arrRing 1.1s ease-out forwards}
-#loc-overlay{position:fixed;inset:0;z-index:100;background:rgba(4,2,0,.65);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .5s}
+#loc-overlay{position:fixed;inset:0;z-index:100;background:rgba(4,2,0,.65);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:auto}
 #loc-box{
-  width:90vw;max-width:1100px;height:85vh;overflow-y:auto;padding:52px 64px 48px;
+  width:90vw;max-width:1100px;height:85vh;overflow-y:auto;padding:52px 64px 48px;pointer-events:auto;cursor:auto;
   clip-path:polygon(
     0% 1.5%,1% 0%,3% 1%,6% 0%,9% 1.5%,13% 0%,17% 1%,21% 0%,25% 1.5%,29% 0%,33% 1%,37% 0%,41% 1.5%,45% 0%,49% 1%,53% 0%,57% 1.5%,61% 0%,65% 1%,69% 0%,73% 1.5%,77% 0%,81% 1%,85% 0%,89% 1.5%,93% 0%,96% 1%,99% 0%,100% 1.5%,
     99% 4%,100% 9%,99% 14%,100% 20%,99% 26%,100% 32%,99% 38%,100% 44%,99% 50%,100% 56%,99% 62%,100% 68%,99% 74%,100% 80%,99% 86%,100% 92%,99% 97%,100% 100%,
