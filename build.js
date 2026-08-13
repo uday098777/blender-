@@ -209,7 +209,7 @@ bookCam.position.set(0,0.8,5.5);bookCam.lookAt(0,0.3,0);
 var mapCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
 mapCam.position.set(0,2.5,7);mapCam.lookAt(0,-0.3,0);
 var boatCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-boatCam.position.set(0,2.5,7);boatCam.lookAt(0,-0.3,0);
+boatCam.position.set(0,3.2,0.01);boatCam.lookAt(0,0,0);
 var miniCam=new THREE.PerspectiveCamera(50,180/130,0.01,500);
 miniCam.position.set(0,7,9);miniCam.lookAt(0,0,0);
 var cuCam=new THREE.PerspectiveCamera(35,300/412,0.01,500);
@@ -316,7 +316,7 @@ function s2w(sx,sy){
 }
 function syncBoat(){
   if(!boatRoot)return;
-  var w=s2w(bx,by);boatRoot.position.set(w.x,0.28,w.z);
+  var w=s2w(bx,by);boatRoot.position.set(w.x,0,w.z);
 }
 
 boatEl.addEventListener('mousedown',function(e){
@@ -354,8 +354,8 @@ function checkWP(){
   for(var i=0;i<WP.length;i++){
     var wp=WP[i];if(wp.done)continue;
     var dx=bx-wp.nx*W,dy=by-wp.ny*H;
-    if(Math.sqrt(dx*dx+dy*dy)<100){
-      wp.done=true;visitedCount++;doArrival(bx,by,wp);break;
+    if(Math.sqrt(dx*dx+dy*dy)<150){
+      wp.done=true;visitedCount++;doArrival(bx,by,wp);return;
     }
   }
 }
@@ -387,6 +387,7 @@ function doArrival(sx,sy,wp){
 
 function openPopup(wp){
   appState='popup';
+  document.body.classList.add('popup-mode');
   var box=document.getElementById('loc-box');
   var ov=document.getElementById('loc-overlay');
   var html='';
@@ -421,6 +422,7 @@ function openPopup(wp){
 function closePopup(){
   var ov=document.getElementById('loc-overlay');
   var box=document.getElementById('loc-box');
+  document.body.classList.remove('popup-mode');
   ov.style.opacity='0';
   box.style.transition='transform 0.5s cubic-bezier(0.55,0,1,0.45)';
   box.style.transform='scale(0.03)';
@@ -474,13 +476,20 @@ function animate(){
   if(appState==='map'||appState==='transitioning'||appState==='popup'){
     if(mapRoot)mapRoot.position.y=Math.sin(t*0.3)*0.04;
     mapR.render(mapS,mapCam);
-    if(boatRoot){boatRoot.rotation.y=t*0.85;boatRoot.position.y=0.28+Math.sin(t*1.3)*0.07;}
+    if(boatRoot){boatRoot.rotation.y=t*0.85;}
     boatR.render(boatS,boatCam);
     miniR.render(mapS,miniCam);
   }
 }
 
-bookR.domElement.addEventListener('click',function(){if(appState==='book')goToMap();});
+document.addEventListener('click',function(e){
+  if(appState==='book'){
+    var targ=e.target;
+    if(targ.id==='book-canvas'||targ.tagName==='CANVAS'||targ.classList.contains('bg-parchment')||targ.tagName==='BODY'){
+      goToMap();
+    }
+  }
+});
 
 window.addEventListener('resize',function(){
   W=window.innerWidth;H=window.innerHeight;
@@ -523,9 +532,9 @@ loader.load('pirate_map.glb',function(g){
 },null,function(e){console.error('Map:',e);onLoad();});
 
 loader.load('ship_pinnace_aft_diff.glb',function(g){
-  var inner=g.scene;fitTo(inner,0.9);
+  var inner=g.scene;fitTo(inner,1.2);
   boatRoot=new THREE.Group();boatRoot.add(inner);
-  boatRoot.position.set(0,0.28,0);
+  boatRoot.position.set(0,0,0);
   boatS.add(boatRoot);onLoad();
 },null,function(e){console.error('Ship:',e);onLoad();});
 
@@ -561,7 +570,7 @@ body.map-mode #map-canvas{display:block!important}
 #boat-canvas{display:none;position:fixed;top:0;left:0;z-index:7;pointer-events:none}
 body.map-mode #boat-canvas{display:block}
 #mini-wrap{display:none;position:fixed;bottom:20px;right:20px;z-index:20;flex-direction:column;align-items:center;gap:6px}
-body.map-mode #mini-wrap{display:flex}
+body.popup-mode #mini-wrap{display:flex}
 #mini-canvas{width:180px;height:130px;border:3px solid #8B4513;border-radius:6px;cursor:pointer;
   box-shadow:0 0 0 1px rgba(218,165,32,.4),0 6px 24px rgba(0,0,0,.85);transition:transform .25s,box-shadow .25s;display:block}
 #mini-canvas:hover{transform:scale(1.06);box-shadow:0 0 0 2px rgba(218,165,32,.8),0 8px 28px rgba(0,0,0,.9)}
