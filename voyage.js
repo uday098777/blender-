@@ -1,371 +1,72 @@
-(function(){
-'use strict';
-
-function die(msg){var e=document.getElementById('err');e.style.display='block';e.textContent='ERROR: '+msg;console.error(msg);}
+(function(){'use strict';
+function die(m){var e=document.getElementById('err');e.style.display='block';e.textContent='ERROR: '+m;console.error(m);}
 if(typeof THREE==='undefined'){die('THREE not loaded');return;}
 if(typeof THREE.GLTFLoader==='undefined'){die('GLTFLoader not loaded');return;}
-
 var W=window.innerWidth,H=window.innerHeight;
-
-var bookR=new THREE.WebGLRenderer({antialias:true,alpha:true});
-bookR.setPixelRatio(Math.min(devicePixelRatio,2));bookR.setSize(W,H);
-bookR.domElement.id='book-canvas';document.body.appendChild(bookR.domElement);
-
-var mapR=new THREE.WebGLRenderer({antialias:true,alpha:true});
-mapR.setPixelRatio(Math.min(devicePixelRatio,2));mapR.setSize(W,H);
-mapR.domElement.id='map-canvas';document.body.appendChild(mapR.domElement);
-
-var boatR=new THREE.WebGLRenderer({antialias:true,alpha:true});
-boatR.setPixelRatio(Math.min(devicePixelRatio,2));boatR.setSize(W,H);
-boatR.domElement.id='boat-canvas';document.body.appendChild(boatR.domElement);
-
-var miniR=new THREE.WebGLRenderer({antialias:true,alpha:true,canvas:document.getElementById('mini-canvas')});
-miniR.setPixelRatio(1);miniR.setSize(180,130);
-
-var cuR=new THREE.WebGLRenderer({antialias:true,alpha:true,canvas:document.getElementById('closeup-canvas')});
-cuR.setPixelRatio(1);cuR.setSize(300,412);
-
-var bookCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-bookCam.position.set(0,0.8,5.5);bookCam.lookAt(0,0.3,0);
-var mapCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-mapCam.position.set(0,2.5,7);mapCam.lookAt(0,-0.3,0);
-var boatCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);
-boatCam.position.set(0,2.8,6);boatCam.lookAt(0,0.2,0);
-var miniCam=new THREE.PerspectiveCamera(50,180/130,0.01,500);
-miniCam.position.set(0,7,9);miniCam.lookAt(0,0,0);
-var cuCam=new THREE.PerspectiveCamera(35,300/412,0.01,500);
-cuCam.position.set(0,0.5,3.5);cuCam.lookAt(0,0.3,0);
-
+var bookR=new THREE.WebGLRenderer({antialias:true,alpha:true});bookR.setPixelRatio(Math.min(devicePixelRatio,2));bookR.setSize(W,H);bookR.domElement.id='book-canvas';document.body.appendChild(bookR.domElement);
+var mapR=new THREE.WebGLRenderer({antialias:true,alpha:true});mapR.setPixelRatio(Math.min(devicePixelRatio,2));mapR.setSize(W,H);mapR.domElement.id='map-canvas';document.body.appendChild(mapR.domElement);
+var boatR=new THREE.WebGLRenderer({antialias:true,alpha:true});boatR.setPixelRatio(Math.min(devicePixelRatio,2));boatR.setSize(W,H);boatR.domElement.id='boat-canvas';document.body.appendChild(boatR.domElement);
+var miniR=new THREE.WebGLRenderer({antialias:true,alpha:true,canvas:document.getElementById('mini-canvas')});miniR.setPixelRatio(1);miniR.setSize(180,130);
+var cuR=new THREE.WebGLRenderer({antialias:true,alpha:true,canvas:document.getElementById('closeup-canvas')});cuR.setPixelRatio(1);cuR.setSize(300,412);
+var bookCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);bookCam.position.set(0,0.8,5.5);bookCam.lookAt(0,0.3,0);
+var mapCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);mapCam.position.set(0,2.5,7);mapCam.lookAt(0,-0.3,0);
+var boatCam=new THREE.PerspectiveCamera(45,W/H,0.01,500);boatCam.position.set(0,2.8,6);boatCam.lookAt(0,0.2,0);
+var miniCam=new THREE.PerspectiveCamera(50,180/130,0.01,500);miniCam.position.set(0,7,9);miniCam.lookAt(0,0,0);
+var cuCam=new THREE.PerspectiveCamera(35,300/412,0.01,500);cuCam.position.set(0,0.5,3.5);cuCam.lookAt(0,0.3,0);
 function mkDL(c,i,x,y,z){var l=new THREE.DirectionalLight(c,i);l.position.set(x,y,z);return l;}
-var bookS=new THREE.Scene();
-bookS.add(new THREE.AmbientLight(0xffffff,0.9));bookS.add(mkDL(0xffd090,0.8,3,5,4));
-var mapS=new THREE.Scene();
-mapS.add(new THREE.AmbientLight(0xffffff,0.85));
-mapS.add(mkDL(0xffffff,0.9,5,10,7));mapS.add(mkDL(0xffd090,0.4,-5,5,-5));
-var boatS=new THREE.Scene();
-boatS.add(new THREE.AmbientLight(0xffffff,1.0));
-boatS.add(mkDL(0xffd090,1.1,3,8,5));boatS.add(mkDL(0xffffff,0.5,-3,4,-2));
-var cuS=new THREE.Scene();
-cuS.add(new THREE.AmbientLight(0xffffff,1.0));cuS.add(mkDL(0xffd090,0.8,2,4,3));
-
-var clock=new THREE.Clock();
-var loader=new THREE.GLTFLoader();
-var ray=new THREE.Raycaster();
-var mouse=new THREE.Vector2();
+var bookS=new THREE.Scene();bookS.add(new THREE.AmbientLight(0xffffff,0.9));bookS.add(mkDL(0xffd090,0.8,3,5,4));
+var mapS=new THREE.Scene();mapS.add(new THREE.AmbientLight(0xffffff,0.85));mapS.add(mkDL(0xffffff,0.9,5,10,7));mapS.add(mkDL(0xffd090,0.4,-5,5,-5));
+var boatS=new THREE.Scene();boatS.add(new THREE.AmbientLight(0xffffff,1.0));boatS.add(mkDL(0xffd090,1.1,3,8,5));boatS.add(mkDL(0xffffff,0.5,-3,4,-2));
+var cuS=new THREE.Scene();cuS.add(new THREE.AmbientLight(0xffffff,1.0));cuS.add(mkDL(0xffd090,0.8,2,4,3));
+var clock=new THREE.Clock();var loader=new THREE.GLTFLoader();
 var bookRoot=null,mapRoot=null,boatRoot=null,cuRoot=null;
-var appState='loading';
-var baseMapScale=1,mapMult=2.4;
-var bx=W/2,by=H*0.52;
-var dragging=false,dox=0,doy=0;
-var cuRaf=null;
-var visitedCount=0;
-var animating=false;
-
+var appState='loading';var baseMapScale=1,mapMult=2.4;
+var bx=W/2,by=H*0.52;var dragging=false,dox=0,doy=0;var cuRaf=null;var visitedCount=0;var animating=false;
 var WP=[{nx:0.18,ny:0.3,title:"VOYAGE MMXXVI",tag:"THE TALE",sub:"A 36-Hour Plunder of Innovation",secs:[{h:"SAIL BEYOND THE KNOWN WORLD",b:"Plunder the Depths of Innovation. Hoist the sails and chart a course through uncharted waters. Voyage beckons the boldest crews to forge legends across a relentless 36-hour tide where ideas become treasure and innovators become captains of tomorrow."},{h:"THE NUMBERS",b:"36 Hours - The Tide | 3-4 Crew Size | Rs.25,000 Treasure | 26 and 27 September MMXXVI"}],footer:"HOIST THE SAILS - Register now and claim yer place among the legends.",hue:32,done:false},
-{nx:0.55,ny:0.18,title:"THE WATERS I-III",tag:"THE WATERS",sub:"Choose Thy Domain",secs:[{h:"I - AI / Machine Learning - Devil's Triangle",b:"Harness the dark arts of AI and Machine Learning to conquer the unknown. Forge cognitive systems, predictive charting, and intelligent automation that bend the rules of the known world. Tags: LLMs, RAG, Agents, Neural Nets"},{h:"II - Blockchain / Web3 - Tortuga Market",b:"Navigate the future through Blockchain and decentralized waters. Build immutable contracts, token economies, and dApps that answer to no king. Tags: Smart Contracts, DeFi, dApps, Web3"},{h:"III - FinTech - Dead Men's Ledger",b:"Redefine the world of gold and ledgers through secure, scalable financial instruments. Where every transaction tells a tale of trust. Tags: Payments, Banking, Fraud, Trading"}],footer:"Six treasure-hunt domains forged to test the boldest crews.",hue:28,done:false},
+{nx:0.55,ny:0.18,title:"THE WATERS I-III",tag:"THE WATERS",sub:"Choose Thy Domain",secs:[{h:"I - AI Machine Learning - Devils Triangle",b:"Harness the dark arts of AI and Machine Learning to conquer the unknown. Forge cognitive systems, predictive charting, and intelligent automation that bend the rules of the known world. Tags: LLMs, RAG, Agents, Neural Nets"},{h:"II - Blockchain Web3 - Tortuga Market",b:"Navigate the future through Blockchain and decentralized waters. Build immutable contracts, token economies, and dApps that answer to no king. Tags: Smart Contracts, DeFi, dApps, Web3"},{h:"III - FinTech - Dead Mens Ledger",b:"Redefine the world of gold and ledgers through secure, scalable financial instruments. Where every transaction tells a tale of trust. Tags: Payments, Banking, Fraud, Trading"}],footer:"Six treasure-hunt domains forged to test the boldest crews.",hue:28,done:false},
 {nx:0.82,ny:0.22,title:"THE WATERS IV-VI",tag:"THE WATERS",sub:"Domains IV, V and VI",secs:[{h:"IV - Healthcare - Fountain of Youth",b:"Leverage the healing arts to build smarter, more accessible Healthcare. Tackle diagnostics, patient experience, and medical lore making care more human. Tags: MedTech, Diagnostics, Telehealth, AI Health"},{h:"V - Cybersecurity - Davy Jones Vault",b:"Fortify the digital realm against the ever-shifting tides of cyber threat. Build armored systems that guard treasure from raiders. Tags: AppSec, Crypto, Network, Forensics"},{h:"VI - Open Innovation - Shipwreck Cove",b:"Explore limitless waters and bring bold ideas to life across any domain. The cove rewards the daring, the creative, and the relentless. Tags: Any Domain, Creative, Bold Ideas"}],footer:"Pick the waters that match yer expertise and set sail toward glory.",hue:24,done:false},
-{nx:0.22,ny:0.55,title:"THE TREASURE COVE",tag:"TREASURE",sub:"Bounties and Booty",secs:[{h:"FIRST BOUNTY - Rs.10,000 - GOLD HOARD",b:"The finest crew claims the greatest hoard. Build something that shakes the seas and the gold is yours."},{h:"SECOND BOUNTY - Rs.7,000 - SILVER CACHE",b:"Second only in gold but first in glory among the bold."},{h:"THIRD BOUNTY - Rs.5,000 - BRONZE COFFER",b:"Every legend starts with a first conquest. The bronze coffer marks the beginning of your saga."},{h:"EVERY SOUL CLAIMS A SHARE",b:"Crew Garb and T-Shirts, Voyager Certificates, Captain's Bounty, Crew Insignia Stickers, The Brotherhood Network, Counsel of Mentors, Audience with Veterans"}],footer:"Total Treasure Pool: Rs.25,000 awaits the finest crews.",hue:38,done:false},
-{nx:0.7,ny:0.48,title:"CAPTAIN'S LOG",tag:"CAPTAIN'S LOG",sub:"The 36-Hour Odyssey",secs:[{h:"DAY THE FIRST",b:"Orientation of the Fleet, The Voyage Begins, Morning Watch Session I, The Midday Feast, Evening Rations, Deck Games Round I, The Night Feast, Counsel of Captains Session II, Deck Games Round II"},{h:"DAY THE SECOND",b:"Counsel of Captains Session III, The Judgement and Submission Window, Dawn Meal, The Midday Feast, Closing Ceremony, The Voyage Concludes"},{h:"KEY DATES",b:"The Voyage Sets Sail: 26 September 2026. The Voyage Concludes: 27 September 2026."}],footer:"From orientation to closing ceremony - 36 relentless hours of tide.",hue:30,done:false},
-{nx:0.12,ny:0.7,title:"THE CAPTAIN'S CODE",tag:"CODEX",sub:"Rules of the Voyage",secs:[{h:"RULE I - Bring Your Arsenal",b:"Each voyager must bring their own laptop, charger, and power backup for the journey ahead."},{h:"RULE II - No Desertion",b:"None shall depart the arena after registration until the voyage concludes and the tides recede."},{h:"RULE III - Wear Yer Mark",b:"Wear yer participant insignia at all times within the hackathon arena. It is yer mark of passage."},{h:"RULE IV - Sail Fair",b:"Wield only permitted resources and APIs in accordance with the captain's code of conduct."}],footer:"The code is law. Sail true or not at all.",hue:34,done:false},
-{nx:0.48,ny:0.72,title:"THE BROTHERHOOD",tag:"ALLIES",sub:"The GRID Fleet",secs:[{h:"WHO WE ARE",b:"A student-led fellowship of more than 2,000 souls dedicated to empowering students through collaboration, hands-on learning, and real-world opportunities."},{h:"OUR FLEET",b:"2,000+ Souls of the Fleet, 800+ Voyagers Enlisted, AI and Web3 and Cyber Captain's Sessions, Pan-India Reach of the Tides"},{h:"OUR MISSION",b:"Bridge the gap between academy and industry through hackathons, workshops, bootcamps, webinars, networking voyages, and technical initiatives that inspire innovation and forge practical skills."}],footer:"STUDENT-LED, 2000+ SOULS, PAN-INDIA",hue:26,done:false},
+{nx:0.22,ny:0.55,title:"THE TREASURE COVE",tag:"TREASURE",sub:"Bounties and Booty",secs:[{h:"FIRST BOUNTY - Rs.10,000 - GOLD HOARD",b:"The finest crew claims the greatest hoard. Build something that shakes the seas and the gold is yours."},{h:"SECOND BOUNTY - Rs.7,000 - SILVER CACHE",b:"Second only in gold but first in glory among the bold."},{h:"THIRD BOUNTY - Rs.5,000 - BRONZE COFFER",b:"Every legend starts with a first conquest. The bronze coffer marks the beginning of your saga."},{h:"EVERY SOUL CLAIMS A SHARE",b:"Crew Garb and T-Shirts, Voyager Certificates, Captains Bounty, Crew Insignia Stickers, The Brotherhood Network, Counsel of Mentors, Audience with Veterans"}],footer:"Total Treasure Pool: Rs.25,000 awaits the finest crews.",hue:38,done:false},
+{nx:0.7,ny:0.48,title:"CAPTAINS LOG",tag:"CAPTAINS LOG",sub:"The 36-Hour Odyssey",secs:[{h:"DAY THE FIRST",b:"Orientation of the Fleet, The Voyage Begins, Morning Watch Session I, The Midday Feast, Evening Rations, Deck Games Round I, The Night Feast, Counsel of Captains Session II, Deck Games Round II"},{h:"DAY THE SECOND",b:"Counsel of Captains Session III, The Judgement and Submission Window, Dawn Meal, The Midday Feast, Closing Ceremony, The Voyage Concludes"},{h:"KEY DATES",b:"The Voyage Sets Sail: 26 September 2026. The Voyage Concludes: 27 September 2026."}],footer:"From orientation to closing ceremony - 36 relentless hours of tide.",hue:30,done:false},
+{nx:0.12,ny:0.7,title:"THE CAPTAINS CODE",tag:"CODEX",sub:"Rules of the Voyage",secs:[{h:"RULE I - Bring Your Arsenal",b:"Each voyager must bring their own laptop, charger, and power backup for the journey ahead."},{h:"RULE II - No Desertion",b:"None shall depart the arena after registration until the voyage concludes and the tides recede."},{h:"RULE III - Wear Yer Mark",b:"Wear yer participant insignia at all times within the hackathon arena. It is yer mark of passage."},{h:"RULE IV - Sail Fair",b:"Wield only permitted resources and APIs in accordance with the captains code of conduct."}],footer:"The code is law. Sail true or not at all.",hue:34,done:false},
+{nx:0.48,ny:0.72,title:"THE BROTHERHOOD",tag:"ALLIES",sub:"The GRID Fleet",secs:[{h:"WHO WE ARE",b:"A student-led fellowship of more than 2,000 souls dedicated to empowering students through collaboration, hands-on learning, and real-world opportunities."},{h:"OUR FLEET",b:"2,000+ Souls of the Fleet, 800+ Voyagers Enlisted, AI and Web3 and Cyber Captains Sessions, Pan-India Reach of the Tides"},{h:"OUR MISSION",b:"Bridge the gap between academy and industry through hackathons, workshops, bootcamps, webinars, networking voyages, and technical initiatives that inspire innovation and forge practical skills."}],footer:"STUDENT-LED, 2000+ SOULS, PAN-INDIA",hue:26,done:false},
 {nx:0.8,ny:0.68,title:"THE ALLIES",tag:"ALLIES",sub:"Backed by the Finest",secs:[{h:"BLOCKCHAIN ALLY - Algorand",b:"A high-performance Layer-1 blockchain forged for speed, security, and scalability. Near-instant finality, Pure Proof-of-Stake consensus, and energy-efficient architecture for the next generation of Web3."},{h:"COMMUNITY ALLY - OSEN",b:"A technology-driven fellowship championing hackathons, workshops, and developer crews with sponsorships, mentorship, speakers, swag, and growth opportunities across colleges."},{h:"AI AND TECH ALLY - Mewayz Global Corporation",b:"AI-powered Business Operating Platform for ventures, creators, and enterprises. AI orchestration, Web3, CRM, website builders, payment management and marketing tools all on one unified deck."}],footer:"Industry titans powering Voyage with technology, counsel, and resources.",hue:22,done:false},
 {nx:0.35,ny:0.82,title:"THE CODEX",tag:"CODEX",sub:"Lore and Answers",secs:[{h:"WHO MAY JOIN?",b:"All undergraduate and postgraduate souls (1st Year to Final Year) from any college across the realm. No prior hackathon experience required, only the will to build."},{h:"CREW AND TOLL",b:"Sail with a crew of 3 to 4 souls. There is no toll to enlist. The Voyage is free to join."},{h:"HOW ARE VENTURES JUDGED?",b:"Innovation, Technical Execution, Real-World Impact, Presentation Quality, Domain Relevance. Expert captains shall oversee the judgement."},{h:"WHAT TO BRING?",b:"Yer laptop, charger, and power backup. The arena provides the rest. You bring the fire."}],footer:"More questions? Send a raven to the organizing crew.",hue:36,done:false},
-{nx:0.62,ny:0.3,title:"PARLEY",tag:"PARLEY",sub:"Send a Raven",secs:[{h:"THE ORGANIZING CREW",b:"Ganpati Raj: +91 9507542854 | Krishna Raj Barnwal: +91 7320000215 | Ritusree Chanda: +91 7362994375 | Aditya Gaurav: +91 70291 62093"},{h:"MORE CREW",b:"Neeraj Sahu: +91 9336345475 | Moumita Mandal: +91 9229726302 | Omkar Kumar: +91 9631922222 | Mayank Raj: +91 8969212216"},{h:"SEND A RAVEN",b:"Have questions about the Voyage? Reach out to our organizing crew. We stand ready to help ye set sail. Contact: gridcommunity@example.com"}],footer:"We stand ready. Send word and we shall answer.",hue:29,done:false}];
-
-function setProgress(f){
-  var p=Math.round(Math.min(f,1)*100);
-  var bar=document.getElementById('bar');
-  var pct=document.getElementById('pct');
-  if(bar)bar.style.width=p+'%';
-  if(pct)pct.textContent=p+'%';
-}
-function fitTo(obj,size){
-  obj.updateWorldMatrix(true,true);
-  var box=new THREE.Box3().setFromObject(obj);
-  if(box.isEmpty())return;
-  var sz=new THREE.Vector3();box.getSize(sz);
-  var ct=new THREE.Vector3();box.getCenter(ct);
-  var mx=Math.max(sz.x,sz.y,sz.z);if(mx<=0)return;
-  var s=size/mx;obj.scale.setScalar(s);obj.position.set(-ct.x*s,-ct.y*s,-ct.z*s);
-}
-
-function goToMap(){
-  if(appState!=='book'||animating)return;
-  animating=true;appState='transitioning';
-  document.getElementById('book-hint').style.display='none';
-  document.getElementById('fade').classList.add('in');
-  setTimeout(function(){
-    document.body.classList.add('map-mode');
-    animateMapIn();
-    document.getElementById('fade').classList.remove('in');
-    setTimeout(function(){
-      document.getElementById('map-title').style.opacity='1';
-      appState='map';animating=false;updateHint();
-    },800);
-  },900);
-}
-
-function animateMapIn(){
-  if(!mapRoot)return;
-  mapRoot.scale.setScalar(0.001);mapRoot.rotation.y=0;
-  var t0=performance.now(),dur=1000,tgt=baseMapScale*mapMult;
-  (function tick(){
-    var p=Math.min((performance.now()-t0)/dur,1);
-    mapRoot.scale.setScalar(0.001+(1-Math.pow(1-p,3))*(tgt-0.001));
-    if(p<1)requestAnimationFrame(tick);
-  })();
-}
-
-function updateHint(){
-  var h=document.getElementById('waypoint-hint');
-  if(!h)return;
-  h.textContent=visitedCount>=WP.length
-    ?'All locations discovered - True Pirate Legend!'
-    :'Drag the ship to discover locations ('+visitedCount+'/'+WP.length+')';
-}
-
-document.getElementById('mini-canvas').addEventListener('click',function(){
-  if(appState==='popup'){
-    closePopup();
-  } else if(appState==='map'){
-    animateMapIn();bx=W/2;by=H*0.52;updateBoatEl();
-  }
-});
-
+{nx:0.62,ny:0.3,title:"PARLEY",tag:"PARLEY",sub:"Send a Raven",secs:[{h:"THE ORGANIZING CREW",b:"Ganpati Raj: +91 9507542854 | Krishna Raj Barnwal: +91 7320000215 | Ritusree Chanda: +91 7362994375 | Aditya Gaurav: +91 70291 62093"},{h:"MORE CREW",b:"Neeraj Sahu: +91 9336345475 | Moumita Mandal: +91 9229726302 | Omkar Kumar: +91 9631922222 | Mayank Raj: +91 8969212216"},{h:"SEND A RAVEN",b:"Have questions about the Voyage? Reach out to our organizing crew. We stand ready to help ye set sail. Contact: gridcommunity@example.com"}],footer:"We stand ready. Send word and we shall answer.",hue:29,done:false},
+{nx:0.4,ny:0.4,title:"HIDDEN COVE",tag:"SECRET",sub:"Ye Found A Secret Location",secs:[{h:"THE TREASURE OF KNOWLEDGE",b:"True treasure lies not in gold but in the knowledge ye gain, the bonds ye forge, and the ideas ye bring to life."},{h:"SAILORS WISDOM",b:"The roughest seas make the finest sailors. Every challenge faced during this voyage shapes the captain ye shall become."}],footer:"Keep exploring - more secrets await in these waters.",hue:35,done:false},
+{nx:0.88,ny:0.5,title:"THE EASTERN ISLES",tag:"DISCOVERY",sub:"Remote Trading Post",secs:[{h:"MERCHANT TALES",b:"Here traders from distant lands exchange innovations, tools, and wisdom. Network with fellow voyagers and discover new possibilities."},{h:"SUPPLIES AND PROVISIONS",b:"Restock yer mental energy with mentorship sessions, technical workshops, and collaborative spaces."}],footer:"Every port offers new opportunities for those bold enough to explore.",hue:27,done:false},
+{nx:0.15,ny:0.85,title:"SOUTHERN DEPTHS",tag:"MYSTERY",sub:"The Kraken Territory",secs:[{h:"LEGENDARY CHALLENGES",b:"The deepest waters hide the greatest challenges. Tackle advanced problem statements that test the limits of innovation."},{h:"RISK AND REWARD",b:"Ventures into unknown territory often yield the greatest discoveries. Fortune favors the bold."}],footer:"Navigate carefully - greatness awaits those who dare.",hue:20,done:false},
+{nx:0.75,ny:0.85,title:"GHOST SHIP BAY",tag:"LEGEND",sub:"Echoes of Past Voyagers",secs:[{h:"STORIES OF OLD",b:"Learn from the victories and defeats of previous hackathon fleets. Their legends guide yer journey."},{h:"HALLS OF FAME",b:"The greatest projects and innovators are immortalized here. Will yer crew join their ranks?"}],footer:"History remembers those who dare to sail beyond the horizon.",hue:33,done:false}];
+function setProgress(f){var p=Math.round(Math.min(f,1)*100);var bar=document.getElementById('bar');var pct=document.getElementById('pct');if(bar)bar.style.width=p+'%';if(pct)pct.textContent=p+'%';}
+function fitTo(obj,size){obj.updateWorldMatrix(true,true);var box=new THREE.Box3().setFromObject(obj);if(box.isEmpty())return;var sz=new THREE.Vector3();box.getSize(sz);var ct=new THREE.Vector3();box.getCenter(ct);var mx=Math.max(sz.x,sz.y,sz.z);if(mx<=0)return;var s=size/mx;obj.scale.setScalar(s);obj.position.set(-ct.x*s,-ct.y*s,-ct.z*s);}
+function goToMap(){if(appState!=='book'||animating)return;animating=true;appState='transitioning';document.getElementById('book-hint').style.display='none';document.getElementById('fade').classList.add('in');setTimeout(function(){document.body.classList.add('map-mode');animateMapIn();document.getElementById('fade').classList.remove('in');setTimeout(function(){document.getElementById('map-title').style.opacity='1';appState='map';animating=false;updateHint();},800);},900);}
+function animateMapIn(){if(!mapRoot)return;mapRoot.scale.setScalar(0.001);mapRoot.rotation.y=0;var t0=performance.now(),dur=1000,tgt=baseMapScale*mapMult;(function tick(){var p=Math.min((performance.now()-t0)/dur,1);mapRoot.scale.setScalar(0.001+(1-Math.pow(1-p,3))*(tgt-0.001));if(p<1)requestAnimationFrame(tick);})();}
+function updateHint(){var h=document.getElementById('waypoint-hint');if(!h)return;h.textContent=visitedCount>=WP.length?'All locations discovered - True Pirate Legend!':'Drag the ship to discover locations ('+visitedCount+'/'+WP.length+')';}
+document.getElementById('mini-canvas').addEventListener('click',function(){if(appState==='popup'){closePopup();}else if(appState==='map'){animateMapIn();bx=W/2;by=H*0.52;updateBoatEl();}});
 var boatEl=document.getElementById('boat-drag');
 function updateBoatEl(){boatEl.style.left=bx+'px';boatEl.style.top=by+'px';}
 updateBoatEl();
-
-function s2w(sx,sy){
-  var nx=(sx/W)*2-1,ny=-(sy/H)*2+1;
-  var v=new THREE.Vector3(nx,ny,0.5).unproject(mapCam);
-  var d=v.sub(mapCam.position).normalize();
-  if(Math.abs(d.y)<0.0001)return new THREE.Vector3(0,0,0);
-  var t2=-mapCam.position.y/d.y;
-  return new THREE.Vector3(mapCam.position.x+d.x*t2,0,mapCam.position.z+d.z*t2);
-}
-function syncBoat(){
-  if(!boatRoot)return;
-  var w=s2w(bx,by);boatRoot.position.set(w.x,0.22,w.z);
-}
-
-boatEl.addEventListener('mousedown',function(e){
-  if(appState!=='map')return;
-  e.preventDefault();dragging=true;dox=e.clientX-bx;doy=e.clientY-by;
-  boatEl.style.cursor='grabbing';
-});
-document.addEventListener('mousemove',function(e){
-  if(!dragging)return;
-  bx=Math.max(60,Math.min(W-60,e.clientX-dox));
-  by=Math.max(60,Math.min(H-60,e.clientY-doy));
-  updateBoatEl();syncBoat();
-});
-document.addEventListener('mouseup',function(){
-  if(!dragging)return;dragging=false;
-  boatEl.style.cursor='grab';checkWP();
-});
-boatEl.addEventListener('touchstart',function(e){
-  if(appState!=='map')return;e.preventDefault();
-  var t=e.touches[0];dragging=true;dox=t.clientX-bx;doy=t.clientY-by;
-},{passive:false});
-document.addEventListener('touchmove',function(e){
-  if(!dragging)return;e.preventDefault();
-  var t=e.touches[0];
-  bx=Math.max(60,Math.min(W-60,t.clientX-dox));
-  by=Math.max(60,Math.min(H-60,t.clientY-doy));
-  updateBoatEl();syncBoat();
-},{passive:false});
-document.addEventListener('touchend',function(){
-  if(!dragging)return;dragging=false;checkWP();
-});
-
-function checkWP(){
-  if(appState!=='map')return;
-  for(var i=0;i<WP.length;i++){
-    var wp=WP[i];if(wp.done)continue;
-    var dx=bx-wp.nx*W,dy=by-wp.ny*H;
-    if(Math.sqrt(dx*dx+dy*dy)<150){
-      wp.done=true;visitedCount++;doArrival(bx,by,wp);return;
-    }
-  }
-}
-
-function doArrival(sx,sy,wp){
-  var cols=['#DAA520','#FF8C00','#ffffff'];
-  for(var i=0;i<3;i++){
-    (function(delay,col){
-      setTimeout(function(){
-        var r=document.createElement('div');
-        r.className='arr-ring';
-        r.style.left=sx+'px';r.style.top=sy+'px';
-        r.style.borderColor=col;
-        r.style.animationDuration=(1+delay*0.001)+'s';
-        document.body.appendChild(r);
-        setTimeout(function(){r.remove();},1500);
-      },delay);
-    })(i*200,cols[i]);
-  }
-  boatEl.style.transition='transform 0.7s cubic-bezier(0.175,0.885,0.32,1.275)';
-  boatEl.style.transform='translate(-50%,-50%) scale(2.8)';
-  setTimeout(function(){
-    boatEl.style.transition='transform 0.4s ease';
-    boatEl.style.transform='translate(-50%,-50%) scale(1)';
-    setTimeout(function(){openPopup(wp);},420);
-  },730);
-  updateHint();
-}
-
-function openPopup(wp){
-  appState='popup';
-  document.body.classList.add('popup-mode');
-  var box=document.getElementById('loc-box');
-  var ov=document.getElementById('loc-overlay');
-  var html='';
-  html+='<div class="lp-tag">'+wp.tag+'</div>';
-  html+='<h2 class="lp-title">'+wp.title+'</h2>';
-  html+='<div class="lp-sub">'+wp.sub+'</div>';
-  html+='<div class="lp-deco">~ * ~</div>';
-  for(var i=0;i<wp.secs.length;i++){
-    html+='<div class="lp-sec">';
-    html+='<div class="lp-sh">'+wp.secs[i].h+'</div>';
-    html+='<div class="lp-sb">'+wp.secs[i].b+'</div>';
-    html+='</div>';
-  }
-  html+='<div class="lp-footer">'+wp.footer+'</div>';
-  html+='<div class="lp-hint">Click the mini-map below to return to the voyage</div>';
-  box.innerHTML=html;
-
-  var h=wp.hue;
-  box.style.background='radial-gradient(ellipse at 28% 18%,hsl('+(h+16)+',62%,80%) 0%,hsl('+h+',55%,62%) 32%,hsl('+(h-18)+',50%,40%) 100%)';
-
-  ov.style.display='flex';
-  box.style.transform='scale(0.03)';
-  box.offsetHeight;
-  box.style.transition='transform 0.9s cubic-bezier(0.175,0.885,0.32,1.275)';
-  setTimeout(function(){
-    ov.style.opacity='1';
-    box.style.transform='scale(1)';
-  },20);
-  document.getElementById('mini-hint').textContent='Click to return';
-}
-
-function closePopup(){
-  var ov=document.getElementById('loc-overlay');
-  var box=document.getElementById('loc-box');
-  document.body.classList.remove('popup-mode');
-  ov.style.opacity='0';
-  box.style.transition='transform 0.5s cubic-bezier(0.55,0,1,0.45)';
-  box.style.transform='scale(0.03)';
-  setTimeout(function(){
-    ov.style.display='none';
-    appState='map';
-    animateMapIn();
-    bx=W/2;by=H*0.52;updateBoatEl();
-    document.getElementById('mini-hint').textContent='Click to reset';
-  },550);
-}
-
-document.getElementById('open-rules-btn').addEventListener('click',function(){
-  var ov=document.getElementById('rules-overlay');
-  var wrap=document.getElementById('rules-wrap');
-  ov.style.display='flex';ov.style.opacity='0';
-  wrap.style.transform='scale(0.3) rotateY(28deg)';
-  wrap.style.transition='transform 0.65s cubic-bezier(0.175,0.885,0.32,1.275)';
-  setTimeout(function(){ov.style.opacity='1';wrap.style.transform='scale(1) rotateY(0deg)';},20);
-  startCU();
-});
-document.getElementById('close-rules').addEventListener('click',function(){
-  var ov=document.getElementById('rules-overlay');
-  ov.style.opacity='0';
-  document.getElementById('rules-wrap').style.transform='scale(0.3) rotateY(28deg)';
-  setTimeout(function(){ov.style.display='none';stopCU();},480);
-});
-function startCU(){
-  if(cuRaf)return;
-  (function tick(){
-    cuRaf=requestAnimationFrame(tick);
-    if(cuRoot){
-      var t=clock.getElapsedTime();
-      cuRoot.scale.setScalar(cuRoot._bs*2);
-      cuRoot.rotation.y=t*0.35;
-      cuRoot.position.y=Math.sin(t*0.7)*0.06;
-    }
-    cuR.render(cuS,cuCam);
-  })();
-}
+function s2w(sx,sy){var nx=(sx/W)*2-1,ny=-(sy/H)*2+1;var v=new THREE.Vector3(nx,ny,0.5).unproject(mapCam);var d=v.sub(mapCam.position).normalize();if(Math.abs(d.y)<0.0001)return new THREE.Vector3(0,0,0);var t2=-mapCam.position.y/d.y;return new THREE.Vector3(mapCam.position.x+d.x*t2,0,mapCam.position.z+d.z*t2);}
+function syncBoat(){if(!boatRoot)return;var w=s2w(bx,by);boatRoot.position.set(w.x,0.22,w.z);}
+boatEl.addEventListener('mousedown',function(e){if(appState!=='map')return;e.preventDefault();dragging=true;dox=e.clientX-bx;doy=e.clientY-by;boatEl.style.cursor='grabbing';});
+document.addEventListener('mousemove',function(e){if(!dragging)return;bx=Math.max(60,Math.min(W-60,e.clientX-dox));by=Math.max(60,Math.min(H-60,e.clientY-doy));updateBoatEl();syncBoat();});
+document.addEventListener('mouseup',function(){if(!dragging)return;dragging=false;boatEl.style.cursor='grab';checkWP();});
+boatEl.addEventListener('touchstart',function(e){if(appState!=='map')return;e.preventDefault();var t=e.touches[0];dragging=true;dox=t.clientX-bx;doy=t.clientY-by;},{passive:false});
+document.addEventListener('touchmove',function(e){if(!dragging)return;e.preventDefault();var t=e.touches[0];bx=Math.max(60,Math.min(W-60,t.clientX-dox));by=Math.max(60,Math.min(H-60,t.clientY-doy));updateBoatEl();syncBoat();},{passive:false});
+document.addEventListener('touchend',function(){if(!dragging)return;dragging=false;checkWP();});
+function checkWP(){if(appState!=='map')return;for(var i=0;i<WP.length;i++){var wp=WP[i];if(wp.done)continue;var dx=bx-wp.nx*W,dy=by-wp.ny*H;if(Math.sqrt(dx*dx+dy*dy)<140){wp.done=true;visitedCount++;doArrival(bx,by,wp);return;}}}
+function doArrival(sx,sy,wp){var cols=['#DAA520','#FF8C00','#ffffff'];for(var i=0;i<3;i++){(function(delay,col){setTimeout(function(){var r=document.createElement('div');r.className='arr-ring';r.style.left=sx+'px';r.style.top=sy+'px';r.style.borderColor=col;r.style.animationDuration=(1+delay*0.001)+'s';document.body.appendChild(r);setTimeout(function(){r.remove();},1500);},delay);})(i*200,cols[i]);}boatEl.style.transition='transform 0.7s cubic-bezier(0.175,0.885,0.32,1.275)';boatEl.style.transform='translate(-50%,-50%) scale(2.8)';setTimeout(function(){boatEl.style.transition='transform 0.4s ease';boatEl.style.transform='translate(-50%,-50%) scale(1)';setTimeout(function(){openPopup(wp);},420);},730);updateHint();}
+function openPopup(wp){appState='popup';document.body.classList.add('popup-mode');var box=document.getElementById('loc-box');var ov=document.getElementById('loc-overlay');var html='';html+='<div class="lp-tag">'+wp.tag+'</div>';html+='<h2 class="lp-title">'+wp.title+'</h2>';html+='<div class="lp-sub">'+wp.sub+'</div>';html+='<div class="lp-deco">~ * ~</div>';for(var i=0;i<wp.secs.length;i++){html+='<div class="lp-sec">';html+='<div class="lp-sh">'+wp.secs[i].h+'</div>';html+='<div class="lp-sb">'+wp.secs[i].b+'</div>';html+='</div>';}html+='<div class="lp-footer">'+wp.footer+'</div>';html+='<div class="lp-hint">Click the mini-map below to return to the voyage</div>';box.innerHTML=html;var h=wp.hue;box.style.background='radial-gradient(ellipse at 28% 18%,hsl('+(h+16)+',62%,80%) 0%,hsl('+h+',55%,62%) 32%,hsl('+(h-18)+',50%,40%) 100%)';ov.style.display='flex';box.style.transform='scale(0.03)';box.offsetHeight;box.style.transition='transform 0.9s cubic-bezier(0.175,0.885,0.32,1.275)';setTimeout(function(){ov.style.opacity='1';box.style.transform='scale(1)';},20);document.getElementById('mini-hint').textContent='Click to return';}
+function closePopup(){var ov=document.getElementById('loc-overlay');var box=document.getElementById('loc-box');document.body.classList.remove('popup-mode');ov.style.opacity='0';box.style.transition='transform 0.5s cubic-bezier(0.55,0,1,0.45)';box.style.transform='scale(0.03)';setTimeout(function(){ov.style.display='none';appState='map';animateMapIn();bx=W/2;by=H*0.52;updateBoatEl();syncBoat();document.getElementById('mini-hint').textContent='Click to reset';},550);}
+document.getElementById('open-rules-btn').addEventListener('click',function(){var ov=document.getElementById('rules-overlay');var wrap=document.getElementById('rules-wrap');ov.style.display='flex';ov.style.opacity='0';wrap.style.transform='scale(0.3) rotateY(28deg)';wrap.style.transition='transform 0.65s cubic-bezier(0.175,0.885,0.32,1.275)';setTimeout(function(){ov.style.opacity='1';wrap.style.transform='scale(1) rotateY(0deg)';},20);startCU();});
+document.getElementById('close-rules').addEventListener('click',function(){var ov=document.getElementById('rules-overlay');ov.style.opacity='0';document.getElementById('rules-wrap').style.transform='scale(0.3) rotateY(28deg)';setTimeout(function(){ov.style.display='none';stopCU();},480);});
+function startCU(){if(cuRaf)return;(function tick(){cuRaf=requestAnimationFrame(tick);if(cuRoot){var t=clock.getElapsedTime();cuRoot.scale.setScalar(cuRoot._bs*2);cuRoot.rotation.y=t*0.35;cuRoot.position.y=Math.sin(t*0.7)*0.06;}cuR.render(cuS,cuCam);})();}
 function stopCU(){if(cuRaf){cancelAnimationFrame(cuRaf);cuRaf=null;}}
-
-function animate(){
-  requestAnimationFrame(animate);
-  var t=clock.getElapsedTime();
-  if(bookRoot&&(appState==='book'||appState==='transitioning')){
-    bookRoot.rotation.y=Math.sin(t*0.4)*0.35;
-    bookRoot.position.y=Math.sin(t*0.7)*0.08;
-    bookR.render(bookS,bookCam);
-  }
-  if(appState==='map'||appState==='transitioning'||appState==='popup'){
-    if(mapRoot)mapRoot.position.y=Math.sin(t*0.3)*0.04;
-    mapR.render(mapS,mapCam);
-    if(boatRoot){boatRoot.rotation.y=t*0.85;boatRoot.position.y=0.22+Math.sin(t*1.1)*0.05;}
-    boatR.render(boatS,boatCam);
-    miniR.render(mapS,miniCam);
-  }
-}
-
-document.addEventListener('click',function(e){
-  if(appState==='book'){
-    var targ=e.target;
-    if(targ.id==='book-canvas'||targ.tagName==='CANVAS'||targ.classList.contains('bg-parchment')||targ.tagName==='BODY'){
-      goToMap();
-    }
-  }
-});
-
-window.addEventListener('resize',function(){
-  W=window.innerWidth;H=window.innerHeight;
-  [bookCam,mapCam,boatCam].forEach(function(c){c.aspect=W/H;c.updateProjectionMatrix();});
-  bookR.setSize(W,H);mapR.setSize(W,H);boatR.setSize(W,H);
-});
-
-setProgress(0.05);
-var loaded=0,total=3;
-var fakeP=0.05;
-var fakeInt=setInterval(function(){if(fakeP<0.88){fakeP+=0.007;setProgress(fakeP);}},100);
-
-function onLoad(){
-  loaded++;setProgress(0.05+(loaded/total)*0.95);
-  if(loaded>=total){
-    clearInterval(fakeInt);setProgress(1);
-    setTimeout(function(){
-      var ldg=document.getElementById('loading');
-      ldg.classList.add('out');
-      setTimeout(function(){ldg.style.display='none';},1100);
-      appState='book';animate();
-    },400);
-  }
-}
-
-loader.load('book_of_pirate_rules_-_week_5.glb',function(g){
-  var inner=g.scene;fitTo(inner,2.5);
-  bookRoot=new THREE.Group();bookRoot.add(inner);bookS.add(bookRoot);
-  cuRoot=bookRoot;cuRoot._bs=inner.scale.x;
-  onLoad();
-},null,function(e){console.error('Book:',e);onLoad();});
-
-loader.load('pirate_map.glb',function(g){
-  var inner=g.scene;fitTo(inner,3);
-  baseMapScale=inner.scale.x;
-  mapRoot=new THREE.Group();mapRoot.add(inner);
-  mapRoot.position.set(0,-0.5,0);mapRoot.rotation.x=-Math.PI/12;
-  mapRoot.scale.setScalar(0.001);
-  mapS.add(mapRoot);onLoad();
-},null,function(e){console.error('Map:',e);onLoad();});
-
-loader.load('ship_pinnace_aft_diff.glb',function(g){
-  var inner=g.scene;fitTo(inner,0.85);
-  boatRoot=new THREE.Group();boatRoot.add(inner);
-  boatRoot.position.set(0,0.22,0);
-  boatS.add(boatRoot);onLoad();
-},null,function(e){console.error('Ship:',e);onLoad();});
-
+function animate(){requestAnimationFrame(animate);var t=clock.getElapsedTime();if(bookRoot&&(appState==='book'||appState==='transitioning')){bookRoot.rotation.y=Math.sin(t*0.4)*0.35;bookRoot.position.y=Math.sin(t*0.7)*0.08;bookR.render(bookS,bookCam);}if(appState==='map'||appState==='transitioning'||appState==='popup'){if(mapRoot)mapRoot.position.y=Math.sin(t*0.3)*0.04;mapR.render(mapS,mapCam);if(boatRoot){boatRoot.rotation.y=t*0.85;boatRoot.position.y=0.22+Math.sin(t*1.1)*0.05;}boatR.render(boatS,boatCam);miniR.render(mapS,miniCam);}}
+document.addEventListener('click',function(e){if(appState==='book'){var targ=e.target;if(targ.id==='book-canvas'||targ.tagName==='CANVAS'||targ.classList.contains('bg-parchment')||targ.tagName==='BODY'){goToMap();}}});
+window.addEventListener('resize',function(){W=window.innerWidth;H=window.innerHeight;[bookCam,mapCam,boatCam].forEach(function(c){c.aspect=W/H;c.updateProjectionMatrix();});bookR.setSize(W,H);mapR.setSize(W,H);boatR.setSize(W,H);});
+setProgress(0.05);var loaded=0,total=3;var fakeP=0.05;var fakeInt=setInterval(function(){if(fakeP<0.88){fakeP+=0.007;setProgress(fakeP);}},100);
+function onLoad(){loaded++;setProgress(0.05+(loaded/total)*0.95);if(loaded>=total){clearInterval(fakeInt);setProgress(1);setTimeout(function(){var ldg=document.getElementById('loading');ldg.classList.add('out');setTimeout(function(){ldg.style.display='none';},1100);appState='book';animate();},400);}}
+loader.load('book_of_pirate_rules_-_week_5.glb',function(g){var inner=g.scene;fitTo(inner,2.5);bookRoot=new THREE.Group();bookRoot.add(inner);bookS.add(bookRoot);cuRoot=bookRoot;cuRoot._bs=inner.scale.x;onLoad();},null,function(e){console.error('Book:',e);onLoad();});
+loader.load('pirate_map.glb',function(g){var inner=g.scene;fitTo(inner,3);baseMapScale=inner.scale.x;mapRoot=new THREE.Group();mapRoot.add(inner);mapRoot.position.set(0,-0.5,0);mapRoot.rotation.x=-Math.PI/12;mapRoot.scale.setScalar(0.001);mapS.add(mapRoot);onLoad();},null,function(e){console.error('Map:',e);onLoad();});
+loader.load('ship_pinnace_aft_diff.glb',function(g){var inner=g.scene;fitTo(inner,0.95);boatRoot=new THREE.Group();boatRoot.add(inner);boatRoot.position.set(0,0.22,0);boatS.add(boatRoot);onLoad();},null,function(e){console.error('Ship:',e);onLoad();});
 })();
