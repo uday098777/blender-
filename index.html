@@ -5,291 +5,84 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Voyage of the Black Pearl</title>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;background:#100802}
-
-/* ══ WOOD PLANK BACKGROUND ══ */
-.bg-wood{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    repeating-linear-gradient(90deg,
-      #3d2308 0px, #4e2e0a 2px, #61390f 4px, #724418 6px,
-      #61390f 8px, #4e2e0a 12px, #3d2308 38px, #5a3510 40px),
-    linear-gradient(180deg,#2a1505 0%,#3a1f08 30%,#2e1806 70%,#1e1004 100%);
-  background-size:40px 100%,100% 100%;
-}
-
-/* ══ TORN PARCHMENT PAPER ══
-   Full-screen crinkled parchment sitting ON the wood
-   Torn/burned irregular edges via clip-path              */
-.bg-parchment{
-  position:fixed;
-  top:1.5%;left:2%;right:2%;bottom:1.5%;
-  z-index:1;pointer-events:none;
-  background:
-    /* crinkle diagonal lines */
-    repeating-linear-gradient(128deg,transparent 0,transparent 60px,rgba(120,80,20,0.07) 60px,rgba(120,80,20,0.07) 61px),
-    repeating-linear-gradient(52deg, transparent 0,transparent 90px,rgba(90,55,10,0.05) 90px,rgba(90,55,10,0.05) 91px),
-    /* base parchment colour */
-    radial-gradient(ellipse at 30% 25%,#e2c98a 0%,transparent 50%),
-    radial-gradient(ellipse at 70% 75%,#d4b46a 0%,transparent 45%),
-    radial-gradient(ellipse at 50% 50%,#dbbf7e 0%,#c6a050 50%,#9a7230 80%,#7a5520 100%);
-  /* irregular torn/burned outline */
-  clip-path:polygon(
-    1% 4%,   0% 0%,   3% 1%,   7% 0%,  11% 3%,  15% 0%,
-   19% 2%,  24% 0%,  28% 3%,  33% 0%,  37% 2%,  42% 0%,
-   46% 3%,  51% 0%,  55% 2%,  60% 0%,  64% 3%,  69% 0%,
-   73% 2%,  78% 0%,  82% 3%,  87% 0%,  91% 2%,  95% 0%,
-   99% 2%, 100% 0%,
-  100% 4%, 99% 9%,100% 15%, 99% 21%,100% 27%, 99% 33%,
-  100% 39%, 99% 45%,100% 51%, 99% 57%,100% 63%, 99% 69%,
-  100% 75%, 99% 81%,100% 87%, 99% 93%,100% 99%,
-   97% 100%, 93% 98%, 89% 100%, 85% 98%, 81% 100%, 77% 98%,
-   73% 100%, 69% 98%, 65% 100%, 61% 98%, 57% 100%, 53% 98%,
-   49% 100%, 45% 98%, 41% 100%, 37% 98%, 33% 100%, 29% 98%,
-   25% 100%, 21% 98%, 17% 100%, 13% 98%,  9% 100%,  5% 98%,
-    1% 100%,  0% 99%,
-    1% 94%,  0% 88%,  1% 82%,  0% 76%,  1% 70%,  0% 64%,
-    1% 58%,  0% 52%,  1% 46%,  0% 40%,  1% 34%,  0% 28%,
-    1% 22%,  0% 16%,  1% 10%,  0%  4%);
-  /* burn shadow on edges */
-  box-shadow:
-    inset  6px  6px 18px rgba(40,15,0,0.55),
-    inset -6px  6px 18px rgba(40,15,0,0.55),
-    inset  6px -6px 18px rgba(40,15,0,0.55),
-    inset -6px -6px 18px rgba(40,15,0,0.55);
-}
-/* dark outer vignette (wood showing around paper) */
-.bg-vignette{
-  position:fixed;inset:0;z-index:2;pointer-events:none;
-  box-shadow:inset 0 0 90px 45px rgba(8,3,0,0.95),
-             inset 0 0 220px 60px rgba(5,2,0,0.5);
-}
-
-/* ══ CANVASES ══ */
+.bg-wood{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,#3d2308 0px,#4e2e0a 2px,#61390f 4px,#724418 6px,#61390f 8px,#4e2e0a 12px,#3d2308 38px,#5a3510 40px),linear-gradient(180deg,#2a1505 0%,#3a1f08 30%,#2e1806 70%,#1e1004 100%);background-size:40px 100%,100% 100%}
+.bg-parchment{position:fixed;top:1.5%;left:2%;right:2%;bottom:1.5%;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 30% 25%,#e2c98a 0%,transparent 50%),radial-gradient(ellipse at 70% 75%,#d4b46a 0%,transparent 45%),radial-gradient(ellipse at 50% 50%,#dbbf7e 0%,#c6a050 50%,#9a7230 80%,#7a5520 100%);
+  clip-path:polygon(1% 4%,0% 0%,3% 1%,7% 0%,11% 3%,15% 0%,19% 2%,24% 0%,28% 3%,33% 0%,37% 2%,42% 0%,46% 3%,51% 0%,55% 2%,60% 0%,64% 3%,69% 0%,73% 2%,78% 0%,82% 3%,87% 0%,91% 2%,95% 0%,99% 2%,100% 0%,100% 4%,99% 9%,100% 15%,99% 21%,100% 27%,99% 33%,100% 39%,99% 45%,100% 51%,99% 57%,100% 63%,99% 69%,100% 75%,99% 81%,100% 87%,99% 93%,100% 99%,97% 100%,93% 98%,89% 100%,85% 98%,81% 100%,77% 98%,73% 100%,69% 98%,65% 100%,61% 98%,57% 100%,53% 98%,49% 100%,45% 98%,41% 100%,37% 98%,33% 100%,29% 98%,25% 100%,21% 98%,17% 100%,13% 98%,9% 100%,5% 98%,1% 100%,0% 99%,1% 94%,0% 88%,1% 82%,0% 76%,1% 70%,0% 64%,1% 58%,0% 52%,1% 46%,0% 40%,1% 34%,0% 28%,1% 22%,0% 16%,1% 10%,0% 4%)}
+.bg-vignette{position:fixed;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 90px 45px rgba(8,3,0,0.95),inset 0 0 220px 60px rgba(5,2,0,0.5)}
 #book-canvas{display:block;position:fixed;top:0;left:0;z-index:5}
 body.map-mode #book-canvas{display:none!important}
 #map-canvas{display:none;position:fixed;top:0;left:0;z-index:5}
 body.map-mode #map-canvas{display:block!important}
 #boat-canvas{display:none;position:fixed;top:0;left:0;z-index:7;pointer-events:none}
 body.map-mode #boat-canvas{display:block}
-
-/* ══ MINI-MAP (bottom-right duplicate) ══ */
-#minimap-canvas{
-  display:none;position:fixed;bottom:20px;right:20px;
-  width:170px;height:128px;z-index:12;
-  border:3px solid #8B4513;border-radius:6px;cursor:pointer;
-  box-shadow:0 0 0 1px rgba(218,165,32,0.4),0 6px 24px rgba(0,0,0,0.85);
-  transition:transform .25s,box-shadow .25s;
-}
+#minimap-canvas{display:none;position:fixed;bottom:20px;right:20px;width:170px;height:128px;z-index:12;border:3px solid #8B4513;border-radius:6px;cursor:pointer;box-shadow:0 0 0 1px rgba(218,165,32,0.4),0 6px 24px rgba(0,0,0,0.85);transition:transform .25s}
 body.map-mode #minimap-canvas{display:block}
-#minimap-canvas:hover{transform:scale(1.07);box-shadow:0 0 0 2px rgba(218,165,32,0.8),0 8px 28px rgba(0,0,0,0.9)}
-#minimap-label{
-  display:none;position:fixed;bottom:152px;right:20px;width:170px;
-  font-family:'Pirata One',cursive;color:#DAA520;font-size:0.7rem;
-  text-align:center;text-shadow:0 1px 5px rgba(0,0,0,0.95);z-index:12;pointer-events:none;
-}
+#minimap-canvas:hover{transform:scale(1.07)}
+#minimap-label{display:none;position:fixed;bottom:152px;right:20px;width:170px;font-family:'Pirata One',cursive;color:#DAA520;font-size:0.7rem;text-align:center;text-shadow:0 1px 5px rgba(0,0,0,0.95);z-index:12;pointer-events:none}
 body.map-mode #minimap-label{display:block}
-
-/* ══ BOAT DRAG HANDLE ══ */
-#boat-drag{
-  position:fixed;width:110px;height:110px;cursor:grab;z-index:8;
-  transform:translate(-50%,-50%);display:none;
-  user-select:none;-webkit-user-select:none;touch-action:none;
-}
+#boat-drag{position:fixed;width:110px;height:110px;cursor:grab;z-index:8;transform:translate(-50%,-50%);display:none;user-select:none;-webkit-user-select:none;touch-action:none}
 body.map-mode #boat-drag{display:block}
 #boat-drag:active{cursor:grabbing}
-
-/* ══ LOADING ══ */
-#loading{position:fixed;inset:0;z-index:500;background:#07040a;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
+#loading{position:fixed;inset:0;z-index:500;background:#07040a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
 #loading.out{opacity:0;pointer-events:none}
-#loading h1{font-family:'Pirata One',cursive;color:#DAA520;font-size:2.8rem;
-  letter-spacing:6px;margin-bottom:10px;text-shadow:0 0 30px rgba(218,165,32,0.45)}
+#loading h1{font-family:'Pirata One',cursive;color:#DAA520;font-size:2.8rem;letter-spacing:6px;margin-bottom:10px;text-shadow:0 0 30px rgba(218,165,32,0.45)}
 #loading p{color:#7a5a20;font-style:italic;font-family:serif;margin-bottom:32px}
-#bar-bg{width:280px;height:3px;background:#1a0d00;border-radius:2px;border:1px solid #3a2000}
-#bar{height:100%;width:0%;background:linear-gradient(90deg,#8B4513,#DAA520);border-radius:2px;transition:width .3s}
+#bar-bg{width:280px;height:4px;background:#1a0d00;border-radius:2px;border:1px solid #3a2000;overflow:hidden}
+#bar{height:100%;width:0%;background:linear-gradient(90deg,#8B4513,#DAA520,#8B4513);background-size:200% 100%;animation:barShine 1.5s linear infinite;border-radius:2px;transition:width .4s ease}
+@keyframes barShine{0%{background-position:100% 0}100%{background-position:-100% 0}}
 #pct{color:#5a3a10;font-size:.78rem;margin-top:8px;font-family:monospace}
-#err{display:none;position:fixed;inset:0;z-index:999;background:#000;color:#f44;
-  font-family:monospace;padding:30px;overflow:auto;white-space:pre-wrap}
+#err{display:none;position:fixed;inset:0;z-index:999;background:#000;color:#f44;font-family:monospace;padding:30px;overflow:auto;white-space:pre-wrap;font-size:13px}
 #fade{position:fixed;inset:0;background:#07040a;z-index:400;opacity:0;pointer-events:none;transition:opacity .9s}
 #fade.in{opacity:1}
-
-/* ══ HUD ══ */
-#book-hint{position:fixed;bottom:9%;left:50%;transform:translateX(-50%);
-  color:#DAA520;font-family:'Pirata One',cursive;font-size:1.5rem;letter-spacing:3px;
-  opacity:0;pointer-events:none;z-index:10;
-  animation:fadeUp 2.2s ease 1.2s forwards;
-  text-shadow:0 0 18px rgba(218,165,32,0.5);
-  border-bottom:1px solid rgba(218,165,32,0.3);padding-bottom:5px}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateX(-50%) translateY(14px)}
-  to  {opacity:1;transform:translateX(-50%) translateY(0)}}
-#map-title{position:fixed;top:20px;left:50%;transform:translateX(-50%);
-  font-family:'Pirata One',cursive;color:#DAA520;font-size:2.1rem;letter-spacing:6px;
-  opacity:0;transition:opacity .9s;pointer-events:none;z-index:10;
-  text-shadow:0 2px 20px rgba(0,0,0,0.95),0 0 40px rgba(218,165,32,0.15)}
-#open-rules-btn{
-  position:fixed;top:20px;left:20px;z-index:10;
-  font-family:'Pirata One',cursive;color:#DAA520;
-  background:rgba(6,3,0,.85);border:2px solid #6B3A0A;
-  padding:8px 18px;font-size:1rem;cursor:pointer;border-radius:4px;
-  opacity:0;pointer-events:none;transition:opacity .6s,border-color .2s}
+#book-hint{position:fixed;bottom:9%;left:50%;transform:translateX(-50%);color:#DAA520;font-family:'Pirata One',cursive;font-size:1.5rem;letter-spacing:3px;opacity:0;pointer-events:none;z-index:10;animation:fadeUp 2.2s ease 1.2s forwards;text-shadow:0 0 18px rgba(218,165,32,0.5);border-bottom:1px solid rgba(218,165,32,0.3);padding-bottom:5px}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+#map-title{position:fixed;top:20px;left:50%;transform:translateX(-50%);font-family:'Pirata One',cursive;color:#DAA520;font-size:2.1rem;letter-spacing:6px;opacity:0;transition:opacity .9s;pointer-events:none;z-index:10;text-shadow:0 2px 20px rgba(0,0,0,0.95)}
+#open-rules-btn{position:fixed;top:20px;left:20px;z-index:10;font-family:'Pirata One',cursive;color:#DAA520;background:rgba(6,3,0,.85);border:2px solid #6B3A0A;padding:8px 18px;font-size:1rem;cursor:pointer;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .6s}
 body.map-mode #open-rules-btn{opacity:1;pointer-events:all}
 #open-rules-btn:hover{background:rgba(55,25,0,.9);border-color:#DAA520}
-#waypoint-hint{
-  position:fixed;top:70px;left:50%;transform:translateX(-50%);
-  font-family:'Pirata One',cursive;color:#c8a030;font-size:.95rem;
-  opacity:0;pointer-events:none;transition:opacity .7s;z-index:10;
-  text-shadow:0 2px 8px rgba(0,0,0,.95);white-space:nowrap}
+#waypoint-hint{position:fixed;top:70px;left:50%;transform:translateX(-50%);font-family:'Pirata One',cursive;color:#c8a030;font-size:.95rem;opacity:0;pointer-events:none;transition:opacity .7s;z-index:10;text-shadow:0 2px 8px rgba(0,0,0,.95);white-space:nowrap}
 body.map-mode #waypoint-hint{opacity:1}
-
-/* ══ ARRIVAL RINGS ══ */
-@keyframes arrRing{
-  0%  {transform:translate(-50%,-50%) scale(.08);opacity:1}
-  100%{transform:translate(-50%,-50%) scale(5.5);opacity:0}}
-.arr-ring{
-  position:fixed;width:70px;height:70px;border-radius:50%;
-  border:3px solid #DAA520;pointer-events:none;z-index:50;
-  transform:translate(-50%,-50%);
-  animation:arrRing 1.1s ease-out forwards}
-
-/* ══ LOCATION FULL-PAGE POPUP ══ */
-#location-overlay{
-  position:fixed;inset:0;z-index:100;
-  background:rgba(4,2,0,.75);
-  display:none;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .45s}
-#location-box{
-  position:relative;
-  /* full page minus 2-inch sides = 4in total */
-  width:calc(100vw - 4in);max-width:calc(100vw - 4in);min-width:300px;
-  max-height:calc(100vh - 50px);overflow-y:auto;
-  padding:52px 58px 46px;
-  /* torn/burned parchment edges */
-  clip-path:polygon(
-    0% 2%,  1% 0%,  3% 1.5%, 6% 0%,  9% 2%, 12% 0%, 16% 1.5%,20% 0%,
-   24% 2%, 28% 0%, 32% 1.5%,36% 0%, 40% 2%, 44% 0%, 48% 1.5%,52% 0%,
-   56% 2%, 60% 0%, 64% 1.5%,68% 0%, 72% 2%, 76% 0%, 80% 1.5%,84% 0%,
-   88% 2%, 92% 0%, 96% 1.5%,99% 0%,100% 2%,
-   99% 5%,100% 10%, 99% 15%,100% 20%, 99% 26%,100% 32%, 99% 38%,
-  100% 44%, 99% 50%,100% 56%, 99% 62%,100% 68%, 99% 74%,100% 80%,
-   99% 86%,100% 92%, 99% 97%,100% 100%,
-   97% 99%, 92% 100%, 87% 99%, 82% 100%, 77% 99%, 72% 100%, 67% 99%,
-   62% 100%, 57% 99%, 52% 100%, 47% 99%, 42% 100%, 37% 99%, 32% 100%,
-   27% 99%, 22% 100%, 17% 99%, 12% 100%,  7% 99%,  3% 100%,  0% 99%,
-    1% 94%,  0% 88%,  1% 82%,  0% 76%,  1% 70%,  0% 64%,
-    1% 58%,  0% 52%,  1% 46%,  0% 40%,  1% 34%,  0% 28%,
-    1% 22%,  0% 16%,  1% 10%,  0%  5%);
-  background:radial-gradient(ellipse at 35% 25%,#e2c98a 0%,#c9a85a 40%,#8a6028 100%);
-  transform:scale(.04);
-  transition:transform .8s cubic-bezier(.175,.885,.32,1.275);
-  box-shadow:0 20px 80px rgba(0,0,0,.95)}
-#location-box.open{transform:scale(1)}
-#location-box h2{font-family:'Pirata One',cursive;color:#1c0900;font-size:2.6rem;
-  margin-bottom:4px;text-align:center;text-shadow:0 1px 4px rgba(255,180,60,.25)}
-.loc-sub{font-family:'IM Fell English',serif;font-style:italic;color:#452200;font-size:1.1rem;
-  text-align:center;margin-bottom:22px;border-bottom:2px solid rgba(70,35,5,.3);padding-bottom:12px}
+@keyframes arrRing{0%{transform:translate(-50%,-50%) scale(.08);opacity:1}100%{transform:translate(-50%,-50%) scale(5.5);opacity:0}}
+.arr-ring{position:fixed;width:70px;height:70px;border-radius:50%;border:3px solid #DAA520;pointer-events:none;z-index:50;transform:translate(-50%,-50%);animation:arrRing 1.1s ease-out forwards}
+#location-overlay{position:fixed;inset:0;z-index:100;background:rgba(4,2,0,.75);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .5s}
+#location-box{position:relative;width:calc(100vw - 4in);max-width:calc(100vw - 4in);min-width:300px;max-height:calc(100vh - 50px);overflow-y:auto;padding:52px 58px 46px;
+  clip-path:polygon(0% 2%,1% 0%,3% 1.5%,6% 0%,9% 2%,12% 0%,16% 1.5%,20% 0%,24% 2%,28% 0%,32% 1.5%,36% 0%,40% 2%,44% 0%,48% 1.5%,52% 0%,56% 2%,60% 0%,64% 1.5%,68% 0%,72% 2%,76% 0%,80% 1.5%,84% 0%,88% 2%,92% 0%,96% 1.5%,99% 0%,100% 2%,99% 5%,100% 10%,99% 15%,100% 20%,99% 26%,100% 32%,99% 38%,100% 44%,99% 50%,100% 56%,99% 62%,100% 68%,99% 74%,100% 80%,99% 86%,100% 92%,99% 97%,100% 100%,97% 99%,92% 100%,87% 99%,82% 100%,77% 99%,72% 100%,67% 99%,62% 100%,57% 99%,52% 100%,47% 99%,42% 100%,37% 99%,32% 100%,27% 99%,22% 100%,17% 99%,12% 100%,7% 99%,3% 100%,0% 99%,1% 94%,0% 88%,1% 82%,0% 76%,1% 70%,0% 64%,1% 58%,0% 52%,1% 46%,0% 40%,1% 34%,0% 28%,1% 22%,0% 16%,1% 10%,0% 5%);
+  background:radial-gradient(ellipse at 35% 25%,#e2c98a 0%,#c9a85a 40%,#8a6028 100%);transform:scale(.04);transition:transform .8s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 20px 80px rgba(0,0,0,.95)}
+#location-box h2{font-family:'Pirata One',cursive;color:#1c0900;font-size:2.6rem;margin-bottom:4px;text-align:center}
+.loc-sub{font-family:'IM Fell English',serif;font-style:italic;color:#452200;font-size:1.1rem;text-align:center;margin-bottom:22px;border-bottom:2px solid rgba(70,35,5,.3);padding-bottom:12px}
 .loc-deco{text-align:center;font-size:1.8rem;margin:8px 0;color:#7a4510;opacity:.42;letter-spacing:14px}
 #loc-body{font-family:'IM Fell English',serif;color:#1c0900;font-size:1.15rem;line-height:1.9;margin-bottom:14px}
-.loc-quote{font-style:italic;color:#452200;border-left:4px solid #8B4513;
-  padding:14px 18px;margin:18px 0;background:rgba(70,35,5,.1);
-  border-radius:0 6px 6px 0;font-family:'IM Fell English',serif;font-size:1.05rem;line-height:1.65}
-#close-loc{position:absolute;top:14px;right:18px;background:none;border:none;
-  color:#452200;font-size:2.5rem;cursor:pointer;line-height:1;
-  transition:color .2s,transform .2s}
+.loc-quote{font-style:italic;color:#452200;border-left:4px solid #8B4513;padding:14px 18px;margin:18px 0;background:rgba(70,35,5,.1);border-radius:0 6px 6px 0;font-family:'IM Fell English',serif;font-size:1.05rem;line-height:1.65}
+#close-loc{position:absolute;top:14px;right:18px;background:none;border:none;color:#452200;font-size:2.5rem;cursor:pointer;line-height:1;transition:color .2s,transform .2s}
 #close-loc:hover{color:#1c0900;transform:scale(1.15)}
-
-/* ══ RULES POPUP ══ */
-#rules-overlay{
-  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);
-  display:none;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .45s}
-#rules-wrap{
-  position:relative;display:flex;gap:20px;
-  width:88vw;max-width:960px;max-height:88vh;
-  transform:scale(.3) rotateY(28deg);
-  transition:transform .65s cubic-bezier(.175,.885,.32,1.275)}
-#rules-overlay.show #rules-wrap{transform:scale(1) rotateY(0deg)}
-/* left: 2× close-up canvas (torn parchment shape) */
-#closeup-wrap{
-  flex:0 0 300px;width:300px;position:relative;
-  background:linear-gradient(145deg,#d8ba80,#ba9558,#9a7040);
-  border:3px solid #5a3010;border-radius:8px;overflow:hidden;
-  clip-path:polygon(
-    0% 3%,2% 0%,5% 2%,9% 0%,13% 3%,18% 0%,23% 2%,28% 0%,33% 3%,
-   38% 0%,43% 2%,48% 0%,53% 3%,58% 0%,63% 2%,68% 0%,73% 3%,
-   78% 0%,83% 2%,88% 0%,93% 3%,97% 0%,100% 2%,
-   99% 6%,100% 12%,99% 19%,100% 26%,99% 33%,100% 40%,99% 47%,
-  100% 54%,99% 61%,100% 68%,99% 75%,100% 82%,99% 89%,100% 96%,
-   99% 100%,95% 98%,90% 100%,85% 98%,80% 100%,75% 98%,70% 100%,
-   65% 98%,60% 100%,55% 98%,50% 100%,45% 98%,40% 100%,35% 98%,
-   30% 100%,25% 98%,20% 100%,15% 98%,10% 100%,5% 98%,1% 100%,
-    0% 97%,1% 90%,0% 83%,1% 76%,0% 69%,1% 62%,0% 55%,1% 48%,
-    0% 41%,1% 34%,0% 27%,1% 20%,0% 13%,1% 6%)}
-#closeup-badge{
-  position:absolute;top:9px;left:50%;transform:translateX(-50%);
-  font-family:'Pirata One',cursive;color:#1c0900;font-size:.75rem;
-  background:rgba(216,186,128,.9);padding:2px 12px;border-radius:12px;
-  white-space:nowrap;pointer-events:none;z-index:1}
+#rules-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .45s}
+#rules-wrap{position:relative;display:flex;gap:20px;width:88vw;max-width:960px;max-height:88vh;transform:scale(.3) rotateY(28deg);transition:transform .65s cubic-bezier(.175,.885,.32,1.275)}
+#closeup-wrap{flex:0 0 300px;width:300px;position:relative;background:linear-gradient(145deg,#d8ba80,#ba9558,#9a7040);border:3px solid #5a3010;border-radius:8px;overflow:hidden}
+#closeup-badge{position:absolute;top:9px;left:50%;transform:translateX(-50%);font-family:'Pirata One',cursive;color:#1c0900;font-size:.75rem;background:rgba(216,186,128,.9);padding:2px 12px;border-radius:12px;white-space:nowrap;pointer-events:none;z-index:1}
 #closeup-canvas{display:block;width:100%!important;height:auto!important}
-/* right: rules table (also torn parchment shape) */
-#rules-table-panel{
-  flex:1;overflow-y:auto;
-  background:linear-gradient(145deg,#caa46e,#a8804a);
-  border:3px solid #5a3010;border-radius:8px;padding:22px 24px;
-  clip-path:polygon(
-    0% 3%,2% 0%,5% 2%,9% 0%,13% 3%,18% 0%,23% 2%,28% 0%,33% 3%,
-   38% 0%,43% 2%,48% 0%,53% 3%,58% 0%,63% 2%,68% 0%,73% 3%,
-   78% 0%,83% 2%,88% 0%,93% 3%,97% 0%,100% 2%,
-   99% 6%,100% 12%,99% 19%,100% 26%,99% 33%,100% 40%,99% 47%,
-  100% 54%,99% 61%,100% 68%,99% 75%,100% 82%,99% 89%,100% 96%,
-   99% 100%,95% 98%,90% 100%,85% 98%,80% 100%,75% 98%,70% 100%,
-   65% 98%,60% 100%,55% 98%,50% 100%,45% 98%,40% 100%,35% 98%,
-   30% 100%,25% 98%,20% 100%,15% 98%,10% 100%,5% 98%,1% 100%,
-    0% 97%,1% 90%,0% 83%,1% 76%,0% 69%,1% 62%,0% 55%,1% 48%,
-    0% 41%,1% 34%,0% 27%,1% 20%,0% 13%,1% 6%)}
-#rules-table-panel h2{font-family:'Pirata One',cursive;color:#1c0900;font-size:1.6rem;
-  text-align:center;margin-bottom:14px}
+#rules-table-panel{flex:1;overflow-y:auto;background:linear-gradient(145deg,#caa46e,#a8804a);border:3px solid #5a3010;border-radius:8px;padding:22px 24px}
+#rules-table-panel h2{font-family:'Pirata One',cursive;color:#1c0900;font-size:1.6rem;text-align:center;margin-bottom:14px}
 #rules-table-panel table{width:100%;border-collapse:collapse;font-family:'IM Fell English',serif}
-#rules-table-panel th{background:rgba(65,30,0,.55);color:#f0d090;font-size:.88rem;
-  padding:7px 10px;border:1px solid rgba(65,30,0,.4);text-align:left}
-#rules-table-panel td{padding:8px 10px;border:1px solid rgba(65,30,0,.2);
-  color:#1c0900;font-size:.9rem;vertical-align:top;line-height:1.5}
+#rules-table-panel th{background:rgba(65,30,0,.55);color:#f0d090;font-size:.88rem;padding:7px 10px;border:1px solid rgba(65,30,0,.4);text-align:left}
+#rules-table-panel td{padding:8px 10px;border:1px solid rgba(65,30,0,.2);color:#1c0900;font-size:.9rem;vertical-align:top;line-height:1.5}
 #rules-table-panel tr:nth-child(even) td{background:rgba(65,30,0,.1)}
-#rules-table-panel tr:hover td{background:rgba(65,30,0,.18)}
-#close-rules{position:absolute;top:-14px;right:-14px;width:34px;height:34px;
-  background:#7a3800;border:2px solid #DAA520;border-radius:50%;
-  color:#DAA520;font-size:1.3rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .2s,transform .2s}
+#close-rules{position:absolute;top:-14px;right:-14px;width:34px;height:34px;background:#7a3800;border:2px solid #DAA520;border-radius:50%;color:#DAA520;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s}
 #close-rules:hover{background:#4a2000;transform:scale(1.15)}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:rgba(65,30,0,.1)}
-::-webkit-scrollbar-thumb{background:#8B4513;border-radius:3px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:rgba(65,30,0,.1)}::-webkit-scrollbar-thumb{background:#8B4513;border-radius:3px}
 </style>
 </head>
 <body>
-
-<!-- layered background -->
 <div class="bg-wood"></div>
 <div class="bg-parchment"></div>
 <div class="bg-vignette"></div>
-
-<!-- loading -->
-<div id="loading">
-  <h1>VOYAGE</h1>
-  <p>Charting the Seven Seas…</p>
-  <div id="bar-bg"><div id="bar"></div></div>
-  <div id="pct">0%</div>
-</div>
+<div id="loading"><h1>VOYAGE</h1><p>Charting the Seven Seas…</p><div id="bar-bg"><div id="bar"></div></div><div id="pct">0%</div></div>
 <div id="err"></div>
 <div id="fade"></div>
-
-<!-- HUD -->
 <div id="book-hint">Click the Book to Begin Your Voyage</div>
 <div id="map-title">THE SEVEN SEAS</div>
 <button id="open-rules-btn">📜 Pirate Code</button>
@@ -298,10 +91,9 @@ body.map-mode #waypoint-hint{opacity:1}
 <div id="minimap-label">⚓ Click to Reset View</div>
 <div id="boat-drag"></div>
 
-<!-- Location full-page popup -->
 <div id="location-overlay">
   <div id="location-box">
-    <button id="close-loc" aria-label="Close">&times;</button>
+    <button id="close-loc">&times;</button>
     <div class="loc-deco">⚓ ☠ ⚓</div>
     <h2 id="loc-title"></h2>
     <div class="loc-sub" id="loc-sub"></div>
@@ -311,10 +103,9 @@ body.map-mode #waypoint-hint{opacity:1}
   </div>
 </div>
 
-<!-- Rules of Book popup -->
 <div id="rules-overlay">
   <div id="rules-wrap">
-    <button id="close-rules" aria-label="Close">&times;</button>
+    <button id="close-rules">&times;</button>
     <div id="closeup-wrap">
       <div id="closeup-badge">2× Close-Up View</div>
       <canvas id="closeup-canvas" width="300" height="412"></canvas>
@@ -329,42 +120,35 @@ body.map-mode #waypoint-hint{opacity:1}
           <tr><td>III</td><td>No person to game at cards or dice for money aboard the ship</td><td>Flogging</td></tr>
           <tr><td>IV</td><td>Lights and candles out at eight o'clock; if any desire to drink after, they do it on the open deck</td><td>Fine of rum ration</td></tr>
           <tr><td>V</td><td>Every man shall keep his piece, pistols and cutlass clean and fit for service at all times</td><td>Loss of share</td></tr>
-          <tr><td>VI</td><td>No boy or woman to be allowed amongst them; any man found seducing the latter sex shall suffer death</td><td>Death</td></tr>
-          <tr><td>VII</td><td>He that shall desert the ship in battle shall be punished with death or marooning</td><td>Death or Marooning</td></tr>
-          <tr><td>VIII</td><td>No striking one another on board; every man's quarrel to be ended on shore with sword and pistol</td><td>Moses' Law (40 lashes)</td></tr>
+          <tr><td>VI</td><td>No boy or woman allowed; any man found seducing the latter sex shall suffer death</td><td>Death</td></tr>
+          <tr><td>VII</td><td>He that deserts the ship in battle shall be punished with death or marooning</td><td>Death or Marooning</td></tr>
+          <tr><td>VIII</td><td>No striking one another on board; quarrels to be ended on shore with sword and pistol</td><td>Moses' Law (40 lashes)</td></tr>
           <tr><td>IX</td><td>No man shall talk of breaking up their way of living till each has shared a fortune of £1,000</td><td>Marooning</td></tr>
-          <tr><td>X</td><td>Captain and quartermaster receive two shares; master, boatswain and gunner one and a half; all other officers one and a quarter</td><td>Court Martial</td></tr>
+          <tr><td>X</td><td>Captain and quartermaster receive two shares; master, boatswain and gunner one and a half; other officers one and a quarter</td><td>Court Martial</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<script src="voyage.js"></script>
-
-<!-- popup show-class wiring (runs after voyage.js) -->
 <script>
+// Load THREE first, then GLTFLoader, then start app
 (function(){
-  /* location overlay open animation */
-  var locOv=document.getElementById('location-overlay');
-  var locBox=document.getElementById('location-box');
-  var origClose=document.getElementById('close-loc').onclick;
+  function loadScript(src, cb){
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = cb;
+    s.onerror = function(){ document.getElementById('err').style.display='block'; document.getElementById('err').textContent='Failed to load: '+src; };
+    document.head.appendChild(s);
+  }
 
-  /* patch voyage.js showLocation to also add show class */
-  var _origShow=window.showLocation;
-
-  /* rules overlay wiring */
-  var rulesOv=document.getElementById('rules-overlay');
-  document.getElementById('open-rules-btn').addEventListener('click',function(){
-    rulesOv.style.display='flex';
-    requestAnimationFrame(function(){requestAnimationFrame(function(){
-      rulesOv.classList.add('show');
-    });});
-  },true);
-  document.getElementById('close-rules').addEventListener('click',function(){
-    rulesOv.classList.remove('show');
-    setTimeout(function(){rulesOv.style.display='none';},480);
-  },true);
+  loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js', function(){
+    loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', function(){
+      loadScript('voyage.js', function(){
+        console.log('All scripts loaded');
+      });
+    });
+  });
 })();
 </script>
 </body>
